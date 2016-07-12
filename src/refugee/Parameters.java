@@ -2,6 +2,17 @@ package refugee;
 
 class Parameters {
 	 public static double TEMPORAL_RESOLUTION = 1;//steps per hour
+	 //-------Agent Care Weights-------//
+	 public static double DANGER_CARE_WEIGHT = 0.2;
+	 public static double FAMILY_ABROAD_CARE_WEIGHT = 0.2;
+	 //-------Edge Weights-------//
+	 public static double COST_WEIGHT = 2.0;
+	 public static double RISK_WEIGHT = 1.5;
+	 public static double DISTANCE_WEIGHT = 1.0;
+	 public static double SPEED_WEIGHT = 1.0;
+	 public static double POP_WEIGHT = 0.5;
+	 public static double TRANSPORT_LEVEL_WEIGHT = 0.5; 
+
 	 
 	 public static double POP_BLOCK_METERS = 926.1;//Height and width of one population block.
 	 public static int WORLD_TO_POP_SCALE = 10; //scale up from the population data for each household

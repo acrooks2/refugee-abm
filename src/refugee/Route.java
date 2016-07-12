@@ -5,80 +5,51 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-
-class Route
+/**
+ * This class is a wrapper class for an ArrayList that manages a path and other information
+ */
+public class Route
 {
-   // private List<Int2D> path;//list of places this person needs to go
+    private List<Int2D> path;//list of places this person needs to go
     private double distance;
-   // private Mapmaker.Node start;
-   // private Mapmaker.Node end;
+    private MigrationBuilder.Node start;
+    private MigrationBuilder.Node end;
     private double speed;
-    private int population;
-    private double cost;
-    private double transportLevel; 
-    private double deaths; 
 
-    public Route(double speed, double distance,  double cost, double transportLevel, double deaths)
+    public Route(List<Int2D> path, double distance, MigrationBuilder.Node start, MigrationBuilder.Node end, double speed)
     {
-    	this.population = 0; //starts with no one traveling
-        this.speed = speed;
+        this.path = path;
         this.distance = distance;
-        this.cost = cost;
-        this.transportLevel = transportLevel;
-        this.deaths = deaths;
-        
+        this.start = start;
+        this.end = end;
+        this.speed = speed;
     }
 
     /**
      * @return next location to move, null if no more moves
      */
-    /*public Int2D getLocation(int index)
+    public Int2D getLocation(int index)
     {
         Int2D location = path.get(index);
         return location;
-    }*/
+    }
 
     public double getTotalDistance()
     {
         return distance;
     }
-    
-    public double getSpeed()
-    {
-        return speed;
-    }
-    
-    public double getPopulation()
-    {
-        return population;
-    }
-    
-    public double getCost()
-    {
-        return cost;
-    }
-    
-    public double getTransportLevel()
-    {
-        return transportLevel;
-    }
-    
-    public double getDeaths()
-    {
-        return deaths;
-    }
 
-   /* public int getNumSteps()
+    public int getNumSteps()
     {
         return path.size();
     }
 
-    public Mapmaker.Node getStart()
+    public MigrationBuilder.Node getStart()
     {
         return start;
     }
 
-    public Mapmaker.Node getEnd()
+    public MigrationBuilder.Node getEnd()
     {
         return end;
     }
@@ -111,5 +82,8 @@ class Route
         path.add(location);
     }
 
-*/
+
+    public double getSpeed() {
+        return speed;
+    }
 }

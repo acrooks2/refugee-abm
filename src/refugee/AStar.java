@@ -14,7 +14,7 @@ public class AStar {
      * @param goal
      * @return
      */
-    static public Route astarPath(MigrationBuilder.Node start, MigrationBuilder.Node goal, double speed) {
+    static public Route astarPath(MigrationBuilder.Node start, MigrationBuilder.Node goal, double speed, Refugee refugee) {
 
 //       
         // initial check
@@ -80,7 +80,7 @@ public class AStar {
                     continue;
 
                 // otherwise evaluate the cost of this node/edge combo
-                double tentativeCost = x.gx + (Integer) l.info;
+                double tentativeCost = x.gx +l.getWeight(); //changed from integer, still need to change the weighting of the edge weight
                 boolean better = false;
 
                 if(! openSet.contains(nextNode)){
@@ -116,7 +116,7 @@ public class AStar {
      * @param check_capacity determines whether we chceck the capacity of Structure
      * @return
      */
-    public static Route getNearestNode(MigrationBuilder.Node start, Map<MigrationBuilder.Node, List<Structure>> endNodes, double max_distance, boolean check_capacity, double speed)
+  /*  public static Route getNearestNode(MigrationBuilder.Node start, Map<MigrationBuilder.Node, List<Structure>> endNodes, double max_distance, boolean check_capacity, double speed)
     {
         //        int[] cacheKey = new int[] {start.location.xLoc, start.location.yLoc, goal.location.xLoc, goal.location.yLoc};
 //        if (cache.containsKey(cacheKey))
@@ -197,7 +197,7 @@ public class AStar {
                     continue;
 
                 // otherwise evaluate the cost of this node/edge combo
-                double tentativeCost = x.gx + (Integer) l.info;
+                double tentativeCost = x.gx +  l.getWeight();
                 boolean better = false;
 
                 if(! openSet.contains(nextNode)){
@@ -497,7 +497,7 @@ public class AStar {
         result.add(0, start.node.location);
         return new Route(result, totalDistance, start.node, end.node, Parameters.WALKING_SPEED);
     }
-
+    
     /**
      * Gets a point a certain percent a long the line
      * @param start

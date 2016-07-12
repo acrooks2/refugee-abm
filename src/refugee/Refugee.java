@@ -63,8 +63,8 @@ class Refugee implements Steppable{
 		 City bestCity = null;
 		 double max = Double.POSITIVE_INFINITY;
 		 for (City city: citylist){
-			 double cityDesirability = dangerCareWeight()*city.getMilConflict() 
-					 + familyAbroadCareWeight()*city.getFamilyPresence() 
+			 double cityDesirability = dangerCare()*city.getMilConflict() 
+					 + familyAbroadCare()*city.getFamilyPresence() 
 					 + city.getEconomy();
 			 if (city.getPopulation() + family.size() >= city.getQuota()) //if reached quota, desirability is 0 
 				 cityDesirability = 0;
@@ -129,20 +129,20 @@ class Refugee implements Steppable{
 	 }
 	    
 	 
-	 private double dangerCareWeight(){//0-1, young, old, or has family weighted more
+	 private double dangerCare(){//0-1, young, old, or has family weighted more
 		 double dangerCare = 1.0;
 		 if (this.age < 12 || this.age > 60){
-			 dangerCare += 0.3 + 0.2*random.nextDouble();
+			 dangerCare += Parameters.DANGER_CARE_WEIGHT*random.nextDouble();
 		 }
 		 if (this.hasFamily){
-			 dangerCare += (0.3+0.2*random.nextDouble());
+			 dangerCare += (Parameters.DANGER_CARE_WEIGHT*random.nextDouble());
 		 }
 		 return dangerCare;
 	 }
 	 
-	 private double familyAbroadCareWeight(){ //0-1, if traveling without family, cares more
+	 private double familyAbroadCare(){ //0-1, if traveling without family, cares more
 		 double familyCare = 1.0;
-		 if (!this.hasFamily) familyCare = 0.3 + 0.2*random.nextDouble();
+		 if (!this.hasFamily) familyCare += Parameters.FAMILY_ABROAD_CARE_WEIGHT*random.nextDouble();
 		 return familyCare;
 	 }
 
