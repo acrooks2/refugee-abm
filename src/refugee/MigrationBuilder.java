@@ -8,7 +8,7 @@ import com.vividsolutions.jts.geom.LineString;
 import sim.field.network.Edge;
 import sim.util.Int2D;
 
-class Mapmaker {
+class MigrationBuilder {
     public static class Node
     {
         public Int2D location; 

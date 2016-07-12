@@ -4,21 +4,19 @@ import sim.util.Int2D;
 
 class City {
 	private Int2D location;
-	private int quota; //ranked
-	private int milConflict; //ranked
-	private int economy; //ranked
-	private int family; //ranked
-	private int terrain; //ranked
+	private int population;
+	private int quota; //1
+	private int milConflict; //2
+	private int economy; //3
+	private int familyPresence; //2
 	
-	public City(Int2D location, int quota, int milConflict, int economy, int family, 
-			int jobs, int terrain)
+	public City(Int2D location, int quota, int milConflict, int economy, int familyPresence)
     {
        this.location = location;
        this.quota = quota;
        this.milConflict = milConflict;
        this.economy = economy;
-       this.family = family;
-       this.terrain = terrain;
+       this.familyPresence = familyPresence;
        
     }
 	
@@ -30,6 +28,14 @@ class City {
 	    this.location = location;
 	 }	 
 	 
+	public int getPopulation() {
+		return population;
+	 }
+
+	public void setPopulation(int population) {
+		this.population = population;
+	 }	 
+		 
 	 public int getQuota() {
 		    return quota;
 		 }
@@ -55,21 +61,14 @@ class City {
 	 }
 	 
 	 
-	 public int getFamily(){
-		 return family;
+	 public int getFamilyPresence(){
+		 return familyPresence;
 	 }
 	 
-	 public void setFamily(int family){
-		 this.family = family;
+	 public void setFamilyPresence(int familyPresence){
+		 this.familyPresence = familyPresence;
 	 }
 	 
 	 
-	 public int getTerrain(){
-		 return terrain;
-	 }
-	 
-	 public void setTerrain(int terrain){
-		 this.terrain = terrain;
-	 }
 	    
 }

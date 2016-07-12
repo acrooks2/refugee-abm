@@ -17,10 +17,12 @@ class Refugee implements Steppable{
 	private int sex; //0 male, 1 female
 	private int education; // ranked 0-4
 	private boolean hasFamily;
+	private ArrayList<Refugee> family; 
 	private int healthStatus = 0; //default 0 (alive), rank 0-2
 	private double finStatus;
 	private City home;
 	private City goal;
+	private Location position;
 	private Route route;
 	MersenneTwisterFast random ;
 	public Refugee(Int2D location, int finStatus, int sex, int education, int age, boolean hasFamily)
@@ -40,15 +42,42 @@ class Refugee implements Steppable{
 		 if(healthStatus == Constants.DEAD)
 	        {
 	            return;
+	            //change color, or indicate dead
 	        }
 		 else if (finStatus == 0.0){
 			 return;
 		 }
 		 else{
-		 //calc Goal
-		 //move
+			 ArrayList<City> citylist = null; //change later when cities included in map
+		     City goalCity = calcGoalCity(citylist);
+		     if(this.location != goalCity.getLocation()){
+				 //AStar determine route
+				 //move towards it
+		     }
+			
 		 }
 	    }
+	 
+	 
+	 public City calcGoalCity(ArrayList<City> citylist){ //returns the best city
+		 City bestCity = null;
+		 double max = Double.POSITIVE_INFINITY;
+		 for (City city: citylist){
+			 double cityDesirability = dangerCareWeight()*city.getMilConflict() 
+					 + familyAbroadCareWeight()*city.getFamilyPresence() 
+					 + city.getEconomy();
+			 if (city.getPopulation() + family.size() >= city.getQuota()) //if reached quota, desirability is 0 
+				 cityDesirability = 0;
+			 if (cityDesirability > max){				 
+				 max = cityDesirability;
+				 bestCity = city;
+			 }
+			 
+		 }
+		 return bestCity;
+	 }
+	 
+	 
 	//get and set
 	 public Int2D getLocation() {
 	    return location;
@@ -101,7 +130,7 @@ class Refugee implements Steppable{
 	    
 	 
 	 private double dangerCareWeight(){//0-1, young, old, or has family weighted more
-		 double dangerCare = 0;
+		 double dangerCare = 1.0;
 		 if (this.age < 12 || this.age > 60){
 			 dangerCare += 0.3 + 0.2*random.nextDouble();
 		 }
@@ -112,8 +141,8 @@ class Refugee implements Steppable{
 	 }
 	 
 	 private double familyAbroadCareWeight(){ //0-1, if traveling without family, cares more
-		 double familyCare = 0;
-		 if (!this.hasFamily) familyCare = 0.8 + 0.2*random.nextDouble();
+		 double familyCare = 1.0;
+		 if (!this.hasFamily) familyCare = 0.3 + 0.2*random.nextDouble();
 		 return familyCare;
 	 }
 
