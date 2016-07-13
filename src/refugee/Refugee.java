@@ -63,10 +63,10 @@ class Refugee implements Steppable{
 		 City bestCity = null;
 		 double max = Double.POSITIVE_INFINITY;
 		 for (City city: citylist){
-			 double cityDesirability = dangerCare()*city.getMilConflict() 
+			 double cityDesirability = dangerCare()*city.getViolence() 
 					 + familyAbroadCare()*city.getFamilyPresence() 
-					 + city.getEconomy();
-			 if (city.getPopulation() + family.size() >= city.getQuota()) //if reached quota, desirability is 0 
+					 + city.getEconomy() + city.getPopulation();
+			 if (city.getRefugeePopulation() + family.size() >= city.getQuota()) //if reached quota, desirability is 0 
 				 cityDesirability = 0;
 			 if (cityDesirability > max){				 
 				 max = cityDesirability;

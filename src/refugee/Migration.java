@@ -32,7 +32,7 @@ class Migration extends SimState{
     public SparseGrid2D worldPopResolution;//all agents within each km grid cell
     public SparseGrid2D cityGrid;
     public Network roadNetwork = new Network();
-    public GeomVectorField edges;
+    public GeomVectorField roadLinks;
    // public GeomVectorField adminBoundaries;
    // public GeomVectorField adminShape;
     public SparseGrid2D allRoadNodes;//cities for now
