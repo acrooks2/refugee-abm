@@ -90,7 +90,7 @@ class MigrationBuilder {
        this.familyPresence = familyPresence;
      */
     
-    static void makeCities(GeomVectorField[] cities_vector, SparseGrid2D grid){
+    static void makeCities(GeomVectorField cities_vector, SparseGrid2D grid){
     Bag cities = cities_vector.getGeometries();
     	for (int i = 0; i < cities.size(); i++)
     	{

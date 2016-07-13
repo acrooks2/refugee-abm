@@ -18,7 +18,7 @@ class City {
 	//need name, get name, set name
     private MigrationBuilder.Node nearestNode;
 	
-	public City(Int2D location, int population, int quota, int violence, int economy, int familyPresence)
+	public City(Int2D location, int population, int quota, double violence, double economy, double familyPresence)
     {
        this.location = location;
        this.population = population;
