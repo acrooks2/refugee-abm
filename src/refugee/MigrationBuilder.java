@@ -9,6 +9,12 @@ import sim.field.network.Edge;
 import sim.util.Int2D;
 
 class MigrationBuilder {
+	
+	//initialize world
+	public void initializeWorld(Migration world, String popPath, String adminPath, String ageDistPath){
+		
+	}
+	
     public static class Node
     {
         public Int2D location; 

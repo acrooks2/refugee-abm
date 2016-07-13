@@ -18,6 +18,9 @@ class Parameters {
 	 public static int WORLD_TO_POP_SCALE = 10; //scale up from the population data for each household
 	 public static double WALKING_SPEED = 5.1;//km per hour
 	  //-------File paths-------//
+	 public static String POP_PATH = "";
+	 public static String ADMIN_PATH = "";
+	 public static String AGE_DIST_PATH = "";
 	 
 	//population flow parameters
 	 

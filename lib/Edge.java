@@ -182,7 +182,7 @@ public class Edge implements java.io.Serializable, Comparable
         	if (e = e2) return 0;
         	else return (e < e2 ? -1 : 1);
         	}
-        else if (other.info instanceof Long  && info instanceof Long)
+        else if (other.info instanceof Long  && info instanceof Long)//not applicable, delete later
             {
             long l = ((Long)(info)).longValue();
             long l2 = ((Long)(other.info)).longValue();
