@@ -3,12 +3,15 @@ package refugee;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
@@ -230,7 +233,50 @@ class MigrationBuilder {
     	
     	
     }
-    
+    private static void setUpAgeDist(String age_dist_file)
+    {
+        try
+        {
+            // buffer reader for age distribution data
+            CSVReader csvReader = new CSVReader(new FileReader(new File(age_dist_file)));
+            csvReader.readLine();//skip the headers
+            List<String> line = csvReader.readLine();
+            while(!line.isEmpty())
+            {
+                //read in the county ids
+                int county_id = NumberFormat.getNumberInstance(java.util.Locale.US).parse(line.get(0)).intValue();
+                //relevant info is from 5 - 21
+                ArrayList<Double> list = new ArrayList<Double>();
+                //double sum = 0;
+                for(int i = 5; i <= 21; i++)
+                {
+                    list.add(Double.parseDouble(line.get(i)));
+                    //sum += Double.parseDouble(line.get(i));
+                    //Use cumalitive probability
+                    if(i != 5)
+                        list.set(i-5, list.get(i-5) + list.get(i-5 - 1));
+                    //System.out.print(list.get(i-5));
+                }
+                //System.out.println("sum = " + sum);
+                //System.out.println();
+                //now add it to the hashmap
+                age_dist.put(county_id, list);
+                line = csvReader.readLine();
+            }
+        }
+        catch(FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        catch(java.text.ParseException e)
+        {
+            e.printStackTrace();
+        }
+    }
     private static double pick_fin_status() {
 		// TODO Auto-generated method stub
 		return 0;
@@ -253,10 +299,20 @@ class MigrationBuilder {
         for (Object o : geoms)
         {
             MasonGeometry gm = (MasonGeometry) o;
+         	int startid = gm.getIntegerAttribute("START");
+         	int endid = gm.getIntegerAttribute("END");
+         	double speed = gm.getDoubleAttribute("SPEED");
+         	double pop = gm.getDoubleAttribute("POP");
+         	double cost = gm.getDoubleAttribute("COST");
+         	double transportlevel = gm.getDoubleAttribute("TLEVEL");
+         	double deaths = gm.getDoubleAttribute("DEATHS");
+         	
+         	EdgeInfo edgeinfo = new EdgeInfo(startid, endid, speed, pop, cost, transportlevel, deaths);
+         	
             if (gm.getGeometry() instanceof LineString)
             {
                 count++;
-                readLineString((LineString) gm.getGeometry(), xcols, ycols, xmin, ymin, xmax, ymax, migrationSim);
+                readLineString((LineString) gm.getGeometry(), xcols, ycols, xmin, ymin, xmax, ymax, migrationSim, edgeinfo);
 
             } else if (gm.getGeometry() instanceof MultiLineString)
             {
@@ -264,7 +320,7 @@ class MigrationBuilder {
                 for (int i = 0; i < mls.getNumGeometries(); i++)
                 {
                     count++;
-                    readLineString((LineString) mls.getGeometryN(i), xcols, ycols, xmin, ymin, xmax, ymax, migrationSim);
+                    readLineString((LineString) mls.getGeometryN(i), xcols, ycols, xmin, ymin, xmax, ymax, migrationSim, edgeinfo);
                 }
             }
 //            if(count%10000 == 0)
@@ -274,8 +330,8 @@ class MigrationBuilder {
 
     }
     static void readLineString(LineString geometry, int xcols, int ycols, double xmin,
-            double ymin, double xmax, double ymax, Migration migrationSim) {
-
+            double ymin, double xmax, double ymax, Migration migrationSim, EdgeInfo edgeinfo) {
+    		
     		CoordinateSequence cs = geometry.getCoordinateSequence();
     			// iterate over each pair of coordinates and establish a link between
     			// them
@@ -360,7 +416,7 @@ class MigrationBuilder {
     	                continue;
     	            }
 
-    	            int weight = (int) n.location.distance(oldNode.location); // weight is just
+    	            int weight = (int) n.location.distance(oldNode.location); // weight is just //TODO new weight
     	            // distance
     	            //add it to the thinned network if it is the first or last in the cs.
 
@@ -370,7 +426,8 @@ class MigrationBuilder {
     	            }
 
     	            // create the new link and save it
-    	            Edge e = new Edge(oldNode, n, weight);
+    	            
+    	            Edge e = new Edge(oldNode, n, edgeinfo);
     	            migrationSim.roadNetwork.addEdge(e);
 
     	            oldNode.links.add(e);

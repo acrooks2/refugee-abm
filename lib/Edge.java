@@ -109,7 +109,15 @@ public class Edge implements java.io.Serializable, Comparable
     /** Sets the weight of the edge to a java.lang.Double, discarding any previous weight or label.  */
     public void setWeight(double weight)
         {
-        info = new Double(weight);
+    		EdgeInfo edge = (EdgeInfo)this.info.get(0);
+    		Refugee refugee = (Refugee)this.info.get(1); 
+    		return edge.getDistance() * Parameters.DISTANCE_WEIGHT 
+    				+ edge.getSpeed() * Parameters.SPEED_WEIGHT
+    				+ edge.getPopulation() * Parameters.POP_WEIGHT
+    				+ edge.getCost() * Parameters.COST_WEIGHT
+    				+ edge.getTransportLevel() * Parameters.TRANSPORT_LEVEL_WEIGHT
+    				+ edge.getDeaths() * Parameters.RISK_WEIGHT; *refugee.dangerCare();
+    	
         }
 
     /**
@@ -118,18 +126,8 @@ public class Edge implements java.io.Serializable, Comparable
     */
     public double getWeight()
         {
-    	if (info instanceof ArrayList<Object>){											//weighted edge with edgeinfo
-    		//weight appropriately, first doing this without agent care weights
-    		EdgeInfo edge = (EdgeInfo)info.get(0);
-    		Refugee refugee = (Refugee)info.get(1); 
-    		return edge.getDistance() * Parameters.DISTANCE_WEIGHT 
-    				+ edge.getSpeed() * Parameters.SPEED_WEIGHT
-    				+ edge.getPopulation() * Parameters.POP_WEIGHT
-    				+ edge.getCost() * Parameters.COST_WEIGHT
-    				+ edge.getTransportLevel() * Parameters.TRANSPORT_LEVEL_WEIGHT
-    				+ edge.getDeaths() * Parameters.RISK_WEIGHT; *refugee.dangerCare();
-    	}
-    	else if( info instanceof Number )
+
+    	if( info instanceof Number )
             return ((Number)info).doubleValue();
         else if (info instanceof Valuable)
             return ((Valuable)info).doubleValue();
