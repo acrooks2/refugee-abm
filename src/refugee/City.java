@@ -7,7 +7,7 @@ import sim.util.Bag;
 import sim.util.Int2D;
 
 class City {
-	private Int2D location;
+	Int2D location;
 	private int quota; //1
 	private int population;
 	private double violence; //2
@@ -93,6 +93,16 @@ class City {
 	 {
 	    return refugees;
 	 }
+	 
+	    public void setNearestNode(MigrationBuilder.Node node)
+	    {
+	        nearestNode = node;
+	    }
+
+	    public MigrationBuilder.Node getNearestNode()
+	    {
+	        return nearestNode;
+	    }
 	 
 	 //include route saver - route from this city to another, but personalized (each agent)
 	    

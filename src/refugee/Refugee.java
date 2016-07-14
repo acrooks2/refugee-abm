@@ -15,8 +15,6 @@ class Refugee implements Steppable{
 	private Int2D location;
 	private int age;
 	private int sex; //0 male, 1 female
-	private int education; // ranked 0-4
-	private boolean hasFamily;
 	private ArrayList<Refugee> family; 
 	private int healthStatus = 0; //default 0 (alive), rank 0-2
 	private double finStatus;
@@ -25,13 +23,12 @@ class Refugee implements Steppable{
 	private Location position;
 	private Route route;
 	MersenneTwisterFast random ;
-	public Refugee(Int2D location, int finStatus, int sex, int education, int age, boolean hasFamily)
+	public Refugee(Int2D location, double finStatus, int sex, int age, ArrayList<Refugee> family)
     {
        this.location = location;
        this.sex = sex;
        this.age = age;
-       this.education = education;
-       this.hasFamily = hasFamily;
+       this.family = family;
        
        
     }
@@ -112,20 +109,12 @@ class Refugee implements Steppable{
 	 }
 	 
 	 
-	 public int getEducation(){
-		 return education;
+	 public ArrayList<Refugee> getFamily(){
+		 return family;
 	 }
 	 
-	 public void setEducation(int education){
-		 this.education = education;
-	 }
-	 
-	 public boolean getFamily(){
-		 return hasFamily;
-	 }
-	 
-	 public void setFamily(boolean hasFamily){
-		 this.hasFamily = hasFamily;
+	 public void setFamily(ArrayList<Refugee> family){
+		 this.family = family;
 	 }
 	    
 	 
@@ -134,7 +123,7 @@ class Refugee implements Steppable{
 		 if (this.age < 12 || this.age > 60){
 			 dangerCare += Parameters.DANGER_CARE_WEIGHT*random.nextDouble();
 		 }
-		 if (this.hasFamily){
+		 if (this.family.size() > 0){
 			 dangerCare += (Parameters.DANGER_CARE_WEIGHT*random.nextDouble());
 		 }
 		 return dangerCare;
@@ -142,7 +131,7 @@ class Refugee implements Steppable{
 	 
 	 private double familyAbroadCare(){ //0-1, if traveling without family, cares more
 		 double familyCare = 1.0;
-		 if (!this.hasFamily) familyCare += Parameters.FAMILY_ABROAD_CARE_WEIGHT*random.nextDouble();
+		 if (this.family.size() == 1) familyCare += Parameters.FAMILY_ABROAD_CARE_WEIGHT*random.nextDouble();
 		 return familyCare;
 	 }
 
