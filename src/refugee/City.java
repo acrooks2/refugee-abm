@@ -11,6 +11,8 @@ import sim.util.Int2D;
 class City {
 	Int2D location;
 	private int quota; //1
+	private int ID;
+	private int origin;
 	private int population;
 	private double violence; //2
 	private double economy; //3
@@ -21,14 +23,16 @@ class City {
     private MigrationBuilder.Node nearestNode;
     protected HashMap<City, Route> cachedPaths;
 	
-	public City(Int2D location, int population, int quota, double violence, double economy, double familyPresence)
+	public City(Int2D location, int ID, int origin, int population, int quota, double violence, double economy, double familyPresence)
     {
        this.location = location;
+       this.ID = ID;
        this.population = population;
        this.quota = quota;
        this.violence = violence;
        this.economy = economy;
        this.familyPresence = familyPresence;
+       this.origin = origin;
        
     }
 	
@@ -39,6 +43,15 @@ class City {
 	 public void setLocation(Int2D location) {
 	    this.location = location;
 	 }	 
+	 
+	public int getOrigin() {
+		    return origin;
+		 }
+
+		 public void setOrigin(int origin) {
+		    this.origin = origin;
+		 }	 
+		 
 	 
 	 public int getPopulation(){
 		return population;
@@ -55,6 +68,14 @@ class City {
 
 	 public void setQuota(int quota) {
 		    this.quota = quota;
+	 }	 
+	 
+	 public int getID() {
+		    return ID;
+		 }
+
+	 public void setID(int ID) {
+		    this.ID = ID;
 	 }	 
 		 
 	 public double getViolence(){

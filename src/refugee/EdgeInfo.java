@@ -10,15 +10,13 @@ class EdgeInfo
 {
    // private List<Int2D> path;//list of places this person needs to go
     private double distance;
-    private int startid;
-    private int endid;
     private double speed;
     private int population;
     private double cost;
     private double transportLevel; 
     private double deaths; 
 
-    public EdgeInfo(int startid, int endid, double speed, double distance,  double cost, double transportLevel, double deaths)
+    public EdgeInfo(double speed, double distance,  double cost, double transportLevel, double deaths)
     {
     	this.population = 0; //starts with no one traveling
         this.speed = speed;

@@ -6,7 +6,6 @@ import org.jfree.data.general.DefaultValueDataset;
 import org.jfree.data.xy.XYDataItem;
 import org.jfree.data.xy.XYSeries;
 
-import EbolaABM.MovementPattern;
 //import EbolaABM.MovementPattern;
 //import EbolaABM.MovementPattern;
 import sim.engine.MakesSimState;
@@ -35,8 +34,8 @@ class Migration extends SimState{
     public SparseGrid2D cityGrid;
     public Network roadNetwork = new Network();
     public GeomVectorField roadLinks;
-   // public GeomVectorField adminBoundaries;
-   // public GeomVectorField adminShape;
+    public GeomVectorField adminBoundaries;//TODO may not be needed
+    public GeomVectorField adminShape;//TODO may not be needed
     public SparseGrid2D allRoadNodes;//cities for now
     //public DoubleGrid2D road_cost; //accumulated cost to get to nearest node on the road network
     //public IntGrid2D admin_id;//contains id for each location (939 x 990)

@@ -18,6 +18,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.Point;
 
 import sim.field.continuous.Continuous2D;
 import sim.field.geo.GeomVectorField;
@@ -28,6 +29,7 @@ import sim.io.geo.ShapeFileImporter;
 import sim.util.Bag;
 import sim.util.Int2D;
 import sim.util.geo.MasonGeometry;
+import net.sf.csv4j.*;
 
 class MigrationBuilder {
     public static Migration migrationSim;
@@ -51,27 +53,27 @@ class MigrationBuilder {
 	 */
 		migrationSim = sim;
 	    age_dist = new HashMap<Integer, ArrayList<Double>>();
-		String[] cityAttributes = {"NAME", "POP", "QUOTA", "VIOL", "ECON", "FAMILY"};
-		String[] roadAttributes = {"START", "END", "SPEED", "POP", "COST", "TLEVEL", "DEATHS"};
+		String[] cityAttributes = {"NAME", "ID", "ORIG", "POP", "QUOTA", "VIOL", "ECON", "FAMILY"};
+		String[] roadAttributes = {"SPEED", "POP", "COST", "TLEVEL", "DEATHS"};
 		
         //age_dist = new HashMap<Integer, ArrayList<Double>>();
-        sim.world_height = 9990;
-        sim.world_width = 9390;
+		migrationSim.world_height = 9990;
+		migrationSim.world_width = 9390;
 
-	    sim.roadNetwork = new Network();
-	    sim.allRoadNodes = new SparseGrid2D(sim.world_width, sim.world_height);
+		migrationSim.roadNetwork = new Network();
+		migrationSim.allRoadNodes = new SparseGrid2D(sim.world_width, sim.world_height);
 
-	    sim.roadLinks = new GeomVectorField(sim.world_width, sim.world_height);
+		migrationSim.roadLinks = new GeomVectorField(sim.world_width, sim.world_height);
 	    Bag roadAtt = new Bag(roadAttributes);
 	    
 	    GeomVectorField cities_vector = new GeomVectorField();
-	    sim.cityGrid = new SparseGrid2D(sim.world_width, sim.world_height);
+	    migrationSim.cityGrid = new SparseGrid2D(sim.world_width, sim.world_height);
 	    Bag cityAtt = new Bag(cityAttributes);
 	    
 	    try{
-	    String[] files = {""};//shapefiles
+	    String[] files = {Parameters.ROAD_PATH, Parameters.CITY_PATH};//shapefiles
 	    Bag[] attfiles = {roadAtt, cityAtt};
-	    GeomVectorField[] vectorFields = {sim.roadLinks, cities_vector};
+	    GeomVectorField[] vectorFields = {migrationSim.roadLinks, cities_vector};
 	    readInShapefile(files, attfiles, vectorFields);//read in attributes
 	    InputStream inputStream = new FileInputStream("");//COMMENT OUT to change inputter
 	    }
@@ -79,7 +81,7 @@ class MigrationBuilder {
 	    {
 	    	e.printStackTrace();
 	    }
-	    makeCities(cities_vector, sim.cityGrid);
+	    makeCities(cities_vector, migrationSim.cityGrid, migrationSim.cities);
 	    extractFromRoadLinks(migrationSim.roadLinks, migrationSim);
 	    //read in structures
         addCitiesandRefugees(popPath, adminPath);
@@ -110,23 +112,33 @@ class MigrationBuilder {
         //
     }
     
-    static void makeCities(GeomVectorField cities_vector, SparseGrid2D grid){
+    static void makeCities(GeomVectorField cities_vector, SparseGrid2D grid, Bag addTo){
     Bag cities = cities_vector.getGeometries();
+    
+    Envelope e = cities_vector.getMBR();
+    double xmin = e.getMinX(), ymin = e.getMinY(), xmax = e.getMaxX(), ymax = e.getMaxY();
+    int xcols = migrationSim.world_width - 1, ycols = migrationSim.world_height - 1;
     	for (int i = 0; i < cities.size(); i++)
     	{
     	MasonGeometry cityinfo= (MasonGeometry)cities.objs[i];
+    	
+    	 Point point = cities_vector.getGeometryLocation(cityinfo);
+         double x = point.getX(), y = point.getY();
+         int xint = (int) Math.floor(xcols * (x - xmin) / (xmax - xmin)), yint = (int) (ycols - Math.floor(ycols * (y - ymin) / (ymax - ymin))); // REMEMBER TO FLIP THE Y VALUE
+         
     	String name = cityinfo.getStringAttribute("NAME");
-    	Int2D location = new Int2D(cityinfo.getIntegerAttribute("LOCX"), cityinfo.getIntegerAttribute("LOCY"));
+    	int ID = cityinfo.getIntegerAttribute("ID");
+    	int origin = cityinfo.getIntegerAttribute("ORIG");
     	int population = cityinfo.getIntegerAttribute("POP");
     	int quota = cityinfo.getIntegerAttribute("QUOTA");
     	double violence = cityinfo.getDoubleAttribute("VIOL");
     	double economy = cityinfo.getDoubleAttribute("ECON");
     	double familyPresence = cityinfo.getDoubleAttribute("FAMILY");
+    	Int2D location = new Int2D(xint, yint);
     	
-    	
-    	City city = new City(location, population, quota, violence, economy, familyPresence);
-    	migrationSim.cities.add(city);
-        migrationSim.cityGrid.setObjectLocation(city, location);
+    	City city = new City(location, ID, origin, population, quota, violence, economy, familyPresence);
+    	addTo.add(city);
+        grid.setObjectLocation(city, location);
     	}
     }
     static void readInShapefile(String[] files, Bag[] attfiles, GeomVectorField[] vectorFields)
@@ -152,21 +164,17 @@ class MigrationBuilder {
     {
         try
         {
-            System.out.print("Adding cities ");
-            
-            
-           //go through cities
-           //if there's not a node at the city yet (from roads)
-            		//Node newNode = new Node(c.location);
+           System.out.print("Adding cities ");
+           for (Object c : migrationSim.cities){
+        	   
+        	   City city = (City)c;
             InputStream inputstream = new FileInputStream("");
-            
-            int popOfCity = 0;//TODO
-            Int2D location = null;
-            City city= null;
-            int currentPop = 0;
+           
+            int currentPop = 0;//1,4,5,10,3,14,24
             while (true){
-            ArrayList<Refugee> r = createRefugeeFamily(location, city);
-            if (currentPop + r.size() <= popOfCity){
+            	if (city.getOrigin() == 1){
+            ArrayList<Refugee> r = createRefugeeFamily(city.getLocation(), city);
+            if (currentPop + r.size() <= city.getQuota()){
             for (Refugee refugee: r){
             		city.addMember(refugee);
             		migrationSim.refugees.add(refugee);
@@ -175,17 +183,11 @@ class MigrationBuilder {
             }
             else
             	break;
+            	}
             
             }
+           }
             
-
-            
-            //go through edges, start, end etc. 
-            Edge e = null;
-            //add edge to BOTH start and end TODO
-            //other side of edge also add e
-
-
             
         }
         catch(FileNotFoundException e)
@@ -218,7 +220,7 @@ class MigrationBuilder {
             sex = Constants.FEMALE;
 
         //now get age
-        int age = pick_age(age_dist, City city);
+        int age = 0; //pick_age(age_dist, City city);
         double finStatus = pick_fin_status();
         //
         Refugee refugee = new Refugee(location, finStatus, sex, age, null);
@@ -236,6 +238,24 @@ class MigrationBuilder {
     	
     	
     }
+    
+    private static int pick_age(HashMap<Integer, ArrayList<Double>> age_dist, int county_id)
+    {
+        double rand = migrationSim.random.nextDouble();
+        //if(county_id == -9999)
+           // county_id = Parameters.MIN_LIB_COUNTY_ID;
+        ArrayList<Double> dist = age_dist.get(county_id);
+        int i;
+        for(i = 0; i < dist.size(); i++)
+        {
+            if(rand < dist.get(i))
+                break;
+        }
+        int age = i*5 + migrationSim.random.nextInt(5);
+        //System.out.println(age + " years");
+        return age;
+    }
+    
     private static void setUpAgeDist(String age_dist_file)
     {
         try
@@ -255,7 +275,7 @@ class MigrationBuilder {
                 {
                     list.add(Double.parseDouble(line.get(i)));
                     //sum += Double.parseDouble(line.get(i));
-                    //Use cumalitive probability
+                    //Use cumulative probability
                     if(i != 5)
                         list.set(i-5, list.get(i-5) + list.get(i-5 - 1));
                     //System.out.print(list.get(i-5));
@@ -302,15 +322,13 @@ class MigrationBuilder {
         for (Object o : geoms)
         {
             MasonGeometry gm = (MasonGeometry) o;
-         	int startid = gm.getIntegerAttribute("START");
-         	int endid = gm.getIntegerAttribute("END");
          	double speed = gm.getDoubleAttribute("SPEED");
-         	double pop = gm.getDoubleAttribute("POP");
+         	double distance = gm.getDoubleAttribute("SHAPE_length");
          	double cost = gm.getDoubleAttribute("COST");
          	double transportlevel = gm.getDoubleAttribute("TLEVEL");
          	double deaths = gm.getDoubleAttribute("DEATHS");
          	
-         	EdgeInfo edgeinfo = new EdgeInfo(startid, endid, speed, pop, cost, transportlevel, deaths);
+         	EdgeInfo edgeinfo = new EdgeInfo(speed, distance, cost, transportlevel, deaths);
          	
             if (gm.getGeometry() instanceof LineString)
             {

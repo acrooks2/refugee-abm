@@ -21,6 +21,8 @@ class Parameters {
 	 public static String POP_PATH = "";
 	 public static String ADMIN_PATH = "";
 	 public static String AGE_DIST_PATH = "";
+	 public static String ROAD_PATH = "";
+	 public static String CITY_PATH = "";
 	 
 	//population flow parameters
 	 

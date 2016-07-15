@@ -24,7 +24,7 @@ class Refugee implements Steppable{
 	private City home;
 	private City currentcity;
 	private City goal;
-	private Location position;
+	private Int2D position;
 	MersenneTwisterFast random ;
 	public Refugee(Int2D location, double finStatus, int sex, int age, ArrayList<Refugee> family)
     {
