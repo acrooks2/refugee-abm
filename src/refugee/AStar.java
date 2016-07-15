@@ -80,7 +80,15 @@ public class AStar {
                     continue;
 
                 // otherwise evaluate the cost of this node/edge combo
-                double tentativeCost = x.gx +l.getWeight(); //changed from integer, still need to change the weighting of the edge weight
+                EdgeInfo edge = (EdgeInfo)l.getInfo();
+        		double edgeweight = edge.getDistance() * Parameters.DISTANCE_WEIGHT 
+        				+ edge.getSpeed() * Parameters.SPEED_WEIGHT
+        				+ edge.getPopulation() * Parameters.POP_WEIGHT
+        				+ edge.getCost() * Parameters.COST_WEIGHT
+        				+ edge.getTransportLevel() * Parameters.TRANSPORT_LEVEL_WEIGHT
+        				+ edge.getDeaths() * Parameters.RISK_WEIGHT *refugee.dangerCare();
+                
+                double tentativeCost = x.gx + edgeweight; //changed from integer, still need to change the weighting of the edge weight
                 boolean better = false;
 
                 if(! openSet.contains(nextNode)){
@@ -330,7 +338,7 @@ public class AStar {
                 if(better){
                     nextNode.cameFrom = x;
                     nextNode.gx = tentativeCost;
-                    nextNode.fx = nextNode.gx + nextNode.hx;
+                    nextNode.fx = nextNode.gx + nextNode.hx;//weight hx differently
                 }
             }
 

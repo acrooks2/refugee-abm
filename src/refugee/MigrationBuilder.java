@@ -51,7 +51,7 @@ class MigrationBuilder {
 	 */
 		migrationSim = sim;
 	    age_dist = new HashMap<Integer, ArrayList<Double>>();
-		String[] cityAttributes = {"NAME", "LOCX", "LOCY", "POP", "QUOTA", "VIOL", "ECON", "FAMILY"};
+		String[] cityAttributes = {"NAME", "POP", "QUOTA", "VIOL", "ECON", "FAMILY"};
 		String[] roadAttributes = {"START", "END", "SPEED", "POP", "COST", "TLEVEL", "DEATHS"};
 		
         //age_dist = new HashMap<Integer, ArrayList<Double>>();
@@ -67,9 +67,10 @@ class MigrationBuilder {
 	    GeomVectorField cities_vector = new GeomVectorField();
 	    sim.cityGrid = new SparseGrid2D(sim.world_width, sim.world_height);
 	    Bag cityAtt = new Bag(cityAttributes);
+	    
 	    try{
 	    String[] files = {""};//shapefiles
-	    Bag[] attfiles = {};
+	    Bag[] attfiles = {roadAtt, cityAtt};
 	    GeomVectorField[] vectorFields = {sim.roadLinks, cities_vector};
 	    readInShapefile(files, attfiles, vectorFields);//read in attributes
 	    InputStream inputStream = new FileInputStream("");//COMMENT OUT to change inputter
@@ -124,6 +125,7 @@ class MigrationBuilder {
     	
     	
     	City city = new City(location, population, quota, violence, economy, familyPresence);
+    	migrationSim.cities.add(city);
         migrationSim.cityGrid.setObjectLocation(city, location);
     	}
     }
@@ -167,6 +169,7 @@ class MigrationBuilder {
             if (currentPop + r.size() <= popOfCity){
             for (Refugee refugee: r){
             		city.addMember(refugee);
+            		migrationSim.refugees.add(refugee);
             		migrationSim.schedule.scheduleRepeating(refugee);
             	}
             }
@@ -416,7 +419,7 @@ class MigrationBuilder {
     	                continue;
     	            }
 
-    	            int weight = (int) n.location.distance(oldNode.location); // weight is just //TODO new weight
+    	            //int weight = (int) n.location.distance(oldNode.location); // weight is just //TODO new weight
     	            // distance
     	            //add it to the thinned network if it is the first or last in the cs.
 

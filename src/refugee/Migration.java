@@ -6,6 +6,8 @@ import org.jfree.data.general.DefaultValueDataset;
 import org.jfree.data.xy.XYDataItem;
 import org.jfree.data.xy.XYSeries;
 
+import EbolaABM.MovementPattern;
+//import EbolaABM.MovementPattern;
 //import EbolaABM.MovementPattern;
 import sim.engine.MakesSimState;
 import sim.engine.Schedule;
@@ -55,7 +57,7 @@ class Migration extends SimState{
      */
     
     public Bag refugees;
-    public Bag cities;
+    public Bag cities = new Bag();
    // public Map<Integer, List<MovementPattern>> movementPatternMap = new HashMap<>();
     
     public Migration(long seed)
@@ -68,7 +70,9 @@ class Migration extends SimState{
     {
     	super.start();
     	refugees = new Bag();
-    	//MigrationBuilder.initializeWorld(this, Parameters.POP_PATH, Parameters.ADMIN_PATH, Parameters.AGE_DIST_PATH);
+    	MigrationBuilder.initializeWorld(this, Parameters.POP_PATH, Parameters.ADMIN_PATH, Parameters.AGE_DIST_PATH);
+    	
+    	
     	
     	//charts
     	
@@ -79,7 +83,7 @@ class Migration extends SimState{
             public void step(SimState simState)
             {
             	long cStep = simState.schedule.getSteps();
-            	
+
                 /* refugee decides on goal
                  * refugee decides on a route
                  * move the refugee
@@ -89,11 +93,36 @@ class Migration extends SimState{
         };
         this.schedule.scheduleRepeating(chartUpdater);
         
-
-
-            
-            
+        
     }
+    
+   /* Steppable movementManager = new Steppable()
+    {
+        private long lastTime;
+
+        @Override
+        public void step(SimState simState)
+        {
+            long cStep = simState.schedule.getSteps();
+            if(cStep % Math.round(24.0/Parameters.TEMPORAL_RESOLUTION) == 0)//only do this on the daily
+            {
+                long now = System.currentTimeMillis();
+                if(lastTime != 0)
+                    System.out.println("Day " + cStep/24 + "[" + (now-lastTime)/1000 + " secs ]");
+                moveResidents();
+                System.out.println("Managing population flow [" + (System.currentTimeMillis()-now)/1000 + " sec]");
+            }
+        }
+        
+        private void moveResidents(){
+        	for (Refugee r: refugees){
+        		
+        	}
+        }
+        }
+    };
+    this.schedule.scheduleRepeating(movementManager);
+    */
     
     @Override
     public void finish()
@@ -105,22 +134,32 @@ class Migration extends SimState{
     public static void main(String[] args){
 
         // doLoop(Landscape.class, args);
-        doLoop(new MakesSimState()
-          {
-              @Override
-              public SimState newInstance(long seed, String[] args)
-              {
-                  return new Migration(seed);
-              }
+    	long seed = System.currentTimeMillis();
+        Migration simState = new Migration(seed);
+            long io_start = System.currentTimeMillis();
+            simState.start();
+            long io_time = (System.currentTimeMillis()-io_start)/1000;
+            System.out.println("io_time = " + io_time);
+            Schedule schedule = simState.schedule;
+            while(true) {
+                if(!schedule.step(simState)) {
+                    break;
+                }
+            }
 
-              @Override
-              public Class simulationClass()
-              {
-                  return Migration.class;
-              }
-          }, args);
+            //create our run directory
+            
+
+            //write output data to output
+            //create directory output if not exists
+            //write effective reproductive rates
+
+
+            //write run meta data to a json object and save it
+
+           // doLoop(Migration.class, args);
+            System.exit(0);
         
-          System.exit(0);
     }
 
     
