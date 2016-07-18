@@ -12,11 +12,11 @@ public class Route
 {
     private List<Int2D> path;//list of places this person needs to go
     private double distance;
-    private MigrationBuilder.Node start;
-    private MigrationBuilder.Node end;
+    private City start;
+    private City end;
     private double speed;
 
-    public Route(List<Int2D> path, double distance, MigrationBuilder.Node start, MigrationBuilder.Node end, double speed)
+    public Route(List<Int2D> path, double distance, City start, City end, double speed)
     {
         this.path = path;
         this.distance = distance;
@@ -44,12 +44,12 @@ public class Route
         return path.size();
     }
 
-    public MigrationBuilder.Node getStart()
+    public City getStart()
     {
         return start;
     }
 
-    public MigrationBuilder.Node getEnd()
+    public City getEnd()
     {
         return end;
     }

@@ -16,13 +16,18 @@ class Parameters {
 	 
 	 public static double POP_BLOCK_METERS = 926.1;//Height and width of one population block.
 	 public static int WORLD_TO_POP_SCALE = 10; //scale up from the population data for each household
+	 public static double WORLD_DISCRETIZTION = 0.1;//discretization or buckets for world granularity
+
+	    
 	 public static double WALKING_SPEED = 5.1;//km per hour
 	  //-------File paths-------//
-	 public static String POP_PATH = "";
-	 public static String ADMIN_PATH = "";
-	 public static String AGE_DIST_PATH = "";
-	 public static String ROAD_PATH = "";
-	 public static String CITY_PATH = "";
+	 //public static String POP_PATH = "data/csvs/pop.csv";//have
+	 //public static String ROAD_INFO = "data/csvs/roadinfo.csv";
+	 //public static String CITY_INFO = "data/csvs/cityinfo.csv";
+	 //public static String AGE_DIST_PATH = "";//have, but only take columns that say TOT
+	 public static String ROAD_SHP = "data/shapefiles/roadsatt2.shp";//shapefile
+	 public static String CITY_SHP = "data/shapefiles/cityatt4.shp";//have
+	 //Edge attributes
 	 
 	//population flow parameters
 	 
@@ -38,4 +43,5 @@ class Parameters {
 	    {
 	        return (val*1000.0)/(Parameters.POP_BLOCK_METERS/Parameters.WORLD_TO_POP_SCALE);
 	    }
+	    
 }

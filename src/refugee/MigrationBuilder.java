@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
@@ -34,13 +35,16 @@ import net.sf.csv4j.*;
 class MigrationBuilder {
     public static Migration migrationSim;
     
-    private static HashMap<Integer, ArrayList<Double>> age_dist;
+    //private static HashMap<Integer, ArrayList<Double>> age_dist;
 
-    public static HashSet<Geometry> removeGeometry = new HashSet<Geometry>();
-    public static HashSet<LineString> allLineStrings = new HashSet<LineString>();
-	//initialize world
+    //public static HashSet<Geometry> removeGeometry = new HashSet<Geometry>();
+    //public static HashSet<LineString> allLineStrings = new HashSet<LineString>();
+	
+    //initialize world
 
-	public static void initializeWorld(Migration sim, String popPath, String adminPath, String ageDistPath){
+	//public static void initializeWorld(Migration sim, String popPath, String adminPath, String ageDistPath){
+    
+    public static void initializeWorld(Migration sim){	
 	/*
 	 *     private double distance;
     private MigrationBuilder.Node start;
@@ -52,13 +56,13 @@ class MigrationBuilder {
     private double deaths; 
 	 */
 		migrationSim = sim;
-	    age_dist = new HashMap<Integer, ArrayList<Double>>();
-		String[] cityAttributes = {"NAME", "ID", "ORIG", "POP", "QUOTA", "VIOL", "ECON", "FAMILY"};
-		String[] roadAttributes = {"SPEED", "POP", "COST", "TLEVEL", "DEATHS"};
+	//    age_dist = new HashMap<Integer, ArrayList<Double>>();
+		String[] cityAttributes = {"ID","NAME", "ORIG", "POP", "QUOTA", "VIOL_1", "ECON_1", "FAMILY_1"};
+		String[] roadAttributes = {"ID", "FR", "TO", "SPEED_1", "POP", "COST_1", "TLEVEL_1", "DEATHS_1","LENGTH_1"};
 		
         //age_dist = new HashMap<Integer, ArrayList<Double>>();
-		migrationSim.world_height = 9990;
-		migrationSim.world_width = 9390;
+		migrationSim.world_height = 9990;  //TODO - set correct size
+		migrationSim.world_width = 9390;	//TODO - set correct size
 
 		migrationSim.roadNetwork = new Network();
 		migrationSim.allRoadNodes = new SparseGrid2D(sim.world_width, sim.world_height);
@@ -66,25 +70,28 @@ class MigrationBuilder {
 		migrationSim.roadLinks = new GeomVectorField(sim.world_width, sim.world_height);
 	    Bag roadAtt = new Bag(roadAttributes);
 	    
-	    GeomVectorField cities_vector = new GeomVectorField();
-	    migrationSim.cityGrid = new SparseGrid2D(sim.world_width, sim.world_height);
+
+	    migrationSim.cityPoints = new GeomVectorField(sim.world_width, sim.world_height);
 	    Bag cityAtt = new Bag(cityAttributes);
 	    
-	    try{
-	    String[] files = {Parameters.ROAD_PATH, Parameters.CITY_PATH};//shapefiles
+	    migrationSim.cityGrid = new SparseGrid2D(sim.world_width, sim.world_height);
+	    //Bag cityAtt = new Bag(cityAttributes);
+	    
+	    //try{
+	    String[] files = {Parameters.ROAD_SHP, Parameters.CITY_SHP};//shapefiles
 	    Bag[] attfiles = {roadAtt, cityAtt};
-	    GeomVectorField[] vectorFields = {migrationSim.roadLinks, cities_vector};
+	    GeomVectorField[] vectorFields = {migrationSim.roadLinks, migrationSim.cityPoints};
 	    readInShapefile(files, attfiles, vectorFields);//read in attributes
-	    InputStream inputStream = new FileInputStream("");//COMMENT OUT to change inputter
-	    }
-	    catch(FileNotFoundException e)
-	    {
-	    	e.printStackTrace();
-	    }
-	    makeCities(cities_vector, migrationSim.cityGrid, migrationSim.cities);
+	    //InputStream inputStream = new FileInputStream();//COMMENT OUT to change inputter
+	    //}
+	    //catch(FileNotFoundException e)
+	    //{
+	    //	e.printStackTrace();
+	    //}
+	    makeCities(migrationSim.cityPoints, migrationSim.cityGrid, migrationSim.cities,migrationSim.cityList);
 	    extractFromRoadLinks(migrationSim.roadLinks, migrationSim);
 	    //read in structures
-        addCitiesandRefugees(popPath, adminPath);
+        addCitiesandRefugees();
 	}
 	
     public static class Node
@@ -112,32 +119,35 @@ class MigrationBuilder {
         //
     }
     
-    static void makeCities(GeomVectorField cities_vector, SparseGrid2D grid, Bag addTo){
+    static void makeCities(GeomVectorField cities_vector, SparseGrid2D grid, Bag addTo,Map<Integer, City> cityList){
     Bag cities = cities_vector.getGeometries();
     
     Envelope e = cities_vector.getMBR();
     double xmin = e.getMinX(), ymin = e.getMinY(), xmax = e.getMaxX(), ymax = e.getMaxY();
     int xcols = migrationSim.world_width - 1, ycols = migrationSim.world_height - 1;
+    System.out.println("Reading in Cities");
     	for (int i = 0; i < cities.size(); i++)
     	{
     	MasonGeometry cityinfo= (MasonGeometry)cities.objs[i];
     	
+		//String[] cityAttributes = {"ID","NAME", "ORIG_1", "POP", "QUOTA", "VIOL_1", "ECON_1", "FAMILY_1"};
+    	
     	 Point point = cities_vector.getGeometryLocation(cityinfo);
          double x = point.getX(), y = point.getY();
          int xint = (int) Math.floor(xcols * (x - xmin) / (xmax - xmin)), yint = (int) (ycols - Math.floor(ycols * (y - ymin) / (ymax - ymin))); // REMEMBER TO FLIP THE Y VALUE
-         
-    	String name = cityinfo.getStringAttribute("NAME");
+        //String name = cityinfo.getStringAttribute("NAME_1");
     	int ID = cityinfo.getIntegerAttribute("ID");
     	int origin = cityinfo.getIntegerAttribute("ORIG");
-    	int population = cityinfo.getIntegerAttribute("POP");
+    	double population = cityinfo.getDoubleAttribute("POP");
     	int quota = cityinfo.getIntegerAttribute("QUOTA");
-    	double violence = cityinfo.getDoubleAttribute("VIOL");
-    	double economy = cityinfo.getDoubleAttribute("ECON");
-    	double familyPresence = cityinfo.getDoubleAttribute("FAMILY");
+    	double violence = cityinfo.getDoubleAttribute("VIOL_1");
+    	double economy = cityinfo.getDoubleAttribute("ECON_1");
+    	double familyPresence = cityinfo.getDoubleAttribute("FAMILY_1");
     	Int2D location = new Int2D(xint, yint);
     	
     	City city = new City(location, ID, origin, population, quota, violence, economy, familyPresence);
     	addTo.add(city);
+    	cityList.put(ID,city);
         grid.setObjectLocation(city, location);
     	}
     }
@@ -160,85 +170,68 @@ class MigrationBuilder {
         }
     }
     
-    private static void addCitiesandRefugees(String pop_file, String admin_file)
+    private static void addCitiesandRefugees() 
     {
-        try
-        {
-           System.out.print("Adding cities ");
+        System.out.println("Adding cities ");
            for (Object c : migrationSim.cities){
         	   
         	   City city = (City)c;
-            InputStream inputstream = new FileInputStream("");
+        	   System.out.println("city ID = " + city.getID());
+           // InputStream inputstream = new FileInputStream(pop_file);
            
-            int currentPop = 0;//1,4,5,10,3,14,24
-            while (true){
-            	if (city.getOrigin() == 1){
-            ArrayList<Refugee> r = createRefugeeFamily(city.getLocation(), city);
-            if (currentPop + r.size() <= city.getQuota()){
-            for (Refugee refugee: r){
-            		city.addMember(refugee);
-            		migrationSim.refugees.add(refugee);
-            		migrationSim.schedule.scheduleRepeating(refugee);
-            	}
-            }
-            else
-            	break;
-            	}
+        	if (city.getOrigin() == 1){
+                int currentPop = 0;//1,4,5,10,3,14,24
+	            ArrayList<Refugee> r = createRefugeeFamily(city.getLocation(), city);
+	            while  (currentPop  <= city.getQuota()){
+	            	for (Refugee refugee: r){
+	            		city.addMember(refugee);
+	            		migrationSim.refugees.add(refugee);
+	            		migrationSim.schedule.scheduleRepeating(refugee);
+	            	}
+	            	currentPop += r.size();
+	            }
+	            
+	         }
+        	migrationSim.world = new Continuous2D(Parameters.WORLD_DISCRETIZTION, Parameters.WORLD_TO_POP_SCALE, Parameters.WORLD_TO_POP_SCALE); //TODO set this correctly
             
-            }
+            
            }
-            
-            
-        }
-        catch(FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-        }
     }
-    
-    
-    
     
     private static ArrayList<Refugee> createRefugeeFamily(Int2D location, City city)
     {
 
     	//generate family
-    	int family = pickFamilySize(age_dist, city);
+    	int family = 5; //pickFamilySize(age_dist, city); // TODO - set family size
     	ArrayList<Refugee> refugeeFamily = new ArrayList<Refugee>(family);
     	for (int i = 0; i < family; i++){
-    		
-    	
-        //first pick sex
-        int sex;
-        if(migrationSim.random.nextBoolean())
-            sex = Constants.MALE;
-        else
-            sex = Constants.FEMALE;
-
-        //now get age
-        int age = 0; //pick_age(age_dist, City city);
-        double finStatus = pick_fin_status();
-        //
-        Refugee refugee = new Refugee(location, finStatus, sex, age, null);
-
-        refugeeFamily.add(refugee);
-    }
+    		 	
+	        //first pick sex
+	        int sex;
+	        if(migrationSim.random.nextBoolean())
+	            sex = Constants.MALE;
+	        else
+	            sex = Constants.FEMALE;
+	
+	        //now get age
+	        int age = 0; //pick_age(age_dist, City city);
+	        double finStatus = pick_fin_status();
+	        //
+	        Refugee refugee = new Refugee(location, finStatus, sex, age, null);
+	
+	        refugeeFamily.add(refugee);
+    	}
     	
     	for (Refugee refugee: refugeeFamily){
-    		ArrayList<Refugee> myFamily = refugeeFamily;
-    		myFamily.remove(refugee);
-    		refugee.setFamily(myFamily);
+    		refugee.setFamily(refugeeFamily); // TODO - remove yourself?
     	}
+    	
     	
     	return refugeeFamily;
     	
     	
     }
-    
+    /*
     private static int pick_age(HashMap<Integer, ArrayList<Double>> age_dist, int county_id)
     {
         double rand = migrationSim.random.nextDouble();
@@ -300,6 +293,7 @@ class MigrationBuilder {
             e.printStackTrace();
         }
     }
+ 	*/
     private static double pick_fin_status() {
 		// TODO Auto-generated method stub
 		return 0;
@@ -308,6 +302,7 @@ class MigrationBuilder {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+    
 	static void extractFromRoadLinks(GeomVectorField roadLinks, Migration migrationSim)
     {
         Bag geoms = roadLinks.getGeometries();
@@ -317,19 +312,25 @@ class MigrationBuilder {
         int count = 0;
 
         //allNetworks = new LinkedList<HashSet<LineString>>();
-
+		//String[] roadAttributes = {"ID", "FR", "TO", "SPEED_1", "POP", "COST_1", "TLEVEL_1", "DEATHS_1","LENGTH_1"};
         // extract each edge
         for (Object o : geoms)
         {
             MasonGeometry gm = (MasonGeometry) o;
-         	double speed = gm.getDoubleAttribute("SPEED");
-         	double distance = gm.getDoubleAttribute("SHAPE_length");
-         	double cost = gm.getDoubleAttribute("COST");
-         	double transportlevel = gm.getDoubleAttribute("TLEVEL");
-         	double deaths = gm.getDoubleAttribute("DEATHS");
+            int from = gm.getIntegerAttribute("FR");
+            int to = gm.getIntegerAttribute("TO");
+         	double speed = gm.getDoubleAttribute("SPEED_1");
+         	double distance = gm.getDoubleAttribute("LENGTH_1");
+         	double cost = gm.getDoubleAttribute("COST_1");
+         	double transportlevel = gm.getDoubleAttribute("TLEVEL_1");
+         	double deaths = gm.getDoubleAttribute("DEATHS_1");
          	
-         	EdgeInfo edgeinfo = new EdgeInfo(speed, distance, cost, transportlevel, deaths);
+         	RoadInfo edgeinfo = new RoadInfo(gm.geometry,from, to, speed, distance, cost, transportlevel, deaths);
          	
+         	// build road network
+         	migrationSim.roadNetwork.addEdge(migrationSim.cityList.get(from) , migrationSim.cityList.get(to), edgeinfo);
+         	
+        /* 	
             if (gm.getGeometry() instanceof LineString)
             {
                 count++;
@@ -344,18 +345,24 @@ class MigrationBuilder {
                     readLineString((LineString) mls.getGeometryN(i), xcols, ycols, xmin, ymin, xmax, ymax, migrationSim, edgeinfo);
                 }
             }
+            */
 //            if(count%10000 == 0)
 //                System.out.println("# of linestrings = " + count);
 
         }
 
     }
+	
+	/*
     static void readLineString(LineString geometry, int xcols, int ycols, double xmin,
-            double ymin, double xmax, double ymax, Migration migrationSim, EdgeInfo edgeinfo) {
+            double ymin, double xmax, double ymax, Migration migrationSim, RoadInfo edgeinfo) {
     		
     		CoordinateSequence cs = geometry.getCoordinateSequence();
+
     			// iterate over each pair of coordinates and establish a link between
     			// them
+    		
+    		
     		 if(!allLineStrings.add(geometry)) //Uncomment for linestring trimming
     	            return;
 
@@ -458,9 +465,8 @@ class MigrationBuilder {
     	        }
 
     	        //if we haven't found any links the network should be null
-
-    	    }
-    	            
+    	  */
+  	            
     
 }
 

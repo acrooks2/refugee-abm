@@ -13,7 +13,7 @@ class City {
 	private int quota; //1
 	private int ID;
 	private int origin;
-	private int population;
+	private double population;
 	private double violence; //2
 	private double economy; //3
 	private double familyPresence; //2
@@ -23,7 +23,7 @@ class City {
     private MigrationBuilder.Node nearestNode;
     protected HashMap<City, Route> cachedPaths;
 	
-	public City(Int2D location, int ID, int origin, int population, int quota, double violence, double economy, double familyPresence)
+	public City(Int2D location, int ID, int origin, double population, int quota, double violence, double economy, double familyPresence)
     {
        this.location = location;
        this.ID = ID;
@@ -33,7 +33,7 @@ class City {
        this.economy = economy;
        this.familyPresence = familyPresence;
        this.origin = origin;
-       
+       this.refugees = new HashSet<Refugee>();
     }
 	
 	public Int2D getLocation() {
@@ -53,7 +53,7 @@ class City {
 		 }	 
 		 
 	 
-	 public int getPopulation(){
+	 public double getPopulation(){
 		return population;
 	 }
 	 
@@ -168,7 +168,7 @@ class City {
 	                    route = new Route(path, this.getLocation().distance(destination.getLocation()), this.getNearestNode(), destination.getNearestNode(), 10000);
 	                }
 	                else*/
-	                    route = AStar.astarPath(this.getNearestNode(), destination.getNearestNode(), speed, refugee);
+	                    route = AStar.astarPath(this, destination, speed, refugee);
 	                cachedPaths.put(destination, route);
 	                return route;
 	            }

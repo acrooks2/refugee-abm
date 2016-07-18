@@ -32,8 +32,11 @@ class Migration extends SimState{
 	public Continuous2D world;
     public SparseGrid2D worldPopResolution;//all agents within each km grid cell
     public SparseGrid2D cityGrid;
-    public Network roadNetwork = new Network();
+    public  Network roadNetwork = new Network();
     public GeomVectorField roadLinks;
+    public GeomVectorField cityPoints;
+
+    //public GeomVectorField refugees;
     public GeomVectorField adminBoundaries;//TODO may not be needed
     public GeomVectorField adminShape;//TODO may not be needed
     public SparseGrid2D allRoadNodes;//cities for now
@@ -42,7 +45,7 @@ class Migration extends SimState{
     
     
     //keys are the admin id for each country and the bag has all the residents in that admin area
-    public Map<Integer, Bag> admin_id_sle_residents = new HashMap<>();
+    //public Map<Integer, Bag> admin_id_sle_residents = new HashMap<>();
     
     public int pop_width;
     public int pop_height;
@@ -57,6 +60,8 @@ class Migration extends SimState{
     
     public Bag refugees;
     public Bag cities = new Bag();
+    public Map<Integer, City> cityList = new HashMap<>();
+    
    // public Map<Integer, List<MovementPattern>> movementPatternMap = new HashMap<>();
     
     public Migration(long seed)
@@ -69,7 +74,7 @@ class Migration extends SimState{
     {
     	super.start();
     	refugees = new Bag();
-    	MigrationBuilder.initializeWorld(this, Parameters.POP_PATH, Parameters.ADMIN_PATH, Parameters.AGE_DIST_PATH);
+    	MigrationBuilder.initializeWorld(this);
     	
     	
     	

@@ -116,18 +116,30 @@ public class MigrationWithUI extends GUIState
         display.attach(adminShapePortrayal, "Admin Shape");
         */
 
-        FieldPortrayal2D citiesportrayal = new SparseGridPortrayal2D();
+       /*
+          FieldPortrayal2D citiesportrayal = new SparseGridPortrayal2D();
+        
         citiesportrayal.setField(((Migration)state).cityGrid);
-        citiesportrayal.setPortrayalForAll(new RectanglePortrayal2D(new Color(0, 128, 255), 1.0, false)
+       
+        //citiesportrayal.setPortrayalForAll(new RectanglePortrayal2D(new Color(0, 128, 255), 8.0, true));
+        citiesportrayal.setPortrayalForAll(new RectanglePortrayal2D(new Color(0, 128, 255), 8.0, true));
         {
             @Override
             public void draw(Object object, Graphics2D graphics, DrawInfo2D info)
             {
                 City city = (City) object;
-                    paint = new Color(216, 10, 255);
+                    //paint = new Color(216, 10, 255);
+                    
+                    paint = new Color(227, 137, 109);
                 super.draw(object, graphics, info);
             }
         });
+        */
+        GeomVectorFieldPortrayal citiesportrayal = new GeomVectorFieldPortrayal();
+        citiesportrayal.setField(((Migration) state).cityPoints);
+        //roadLinkPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(0.42f, 0.42f, 0.42f, 0.5f), 2.0, true));
+        citiesportrayal.setPortrayalForAll(new GeomPortrayal(new Color(0, 0, 255), 2.0, true));
+        
         display.attach(citiesportrayal, "Cities");
 
 //        FieldPortrayal2D urbanPortrayal = new SparseGridPortrayal2D();
@@ -138,7 +150,8 @@ public class MigrationWithUI extends GUIState
         //---------------------Adding the road portrayal------------------------------
         GeomVectorFieldPortrayal roadLinkPortrayal = new GeomVectorFieldPortrayal();
         roadLinkPortrayal.setField(((Migration) state).roadLinks);
-        roadLinkPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(0.42f, 0.42f, 0.42f, 0.5f), 2.0, true));
+        //roadLinkPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(0.42f, 0.42f, 0.42f, 0.5f), 2.0, true));
+        roadLinkPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(216, 10, 255), 0.1, true));
         display.attach(roadLinkPortrayal, "Roads");
 
         ContinuousPortrayal2D refugeePortrayal = new ContinuousPortrayal2D();
@@ -148,7 +161,7 @@ public class MigrationWithUI extends GUIState
         {
             public void draw (Object object, Graphics2D graphics, DrawInfo2D info)
             {
-                Refugee resident = (Refugee)object;
+                Refugee refugee = (Refugee)object;
                 paint = new Color(255, 20, 215);
                 super.draw(object, graphics, info);
             }
