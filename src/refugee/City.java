@@ -10,6 +10,7 @@ import sim.util.Int2D;
 
 class City {
 	Int2D location;
+	String name;
 	private int quota; //1
 	private int ID;
 	private int origin;
@@ -24,8 +25,9 @@ class City {
     private MigrationBuilder.Node nearestNode;
     protected HashMap<City, Route> cachedPaths;
 	
-	public City(Int2D location, int ID, int origin, double scaledPop, int pop, int quota, double violence, double economy, double familyPresence)
+	public City(Int2D location, int ID, String name, int origin, double scaledPop, int pop, int quota, double violence, double economy, double familyPresence)
     {
+		this.name = name;
        this.location = location;
        this.ID = ID;
        this.scaledPop = scaledPop;
@@ -37,6 +39,7 @@ class City {
        this.origin = origin;
        this.refugees = new HashSet<Refugee>();
     }
+	
 	
 	public Int2D getLocation() {
 	    return location;
@@ -54,7 +57,14 @@ class City {
 		    this.origin = origin;
 		 }	 
 		 
-	 
+			public String getName() {
+			    return name;
+			 }
+
+			 public void setName(String name) {
+			    this.name = name;
+			 }	 
+			 
 	 public double getScaledPopulation(){
 		return scaledPop;
 	 }

@@ -58,7 +58,7 @@ class MigrationBuilder {
 	 */
 		migrationSim = sim;
 	//    age_dist = new HashMap<Integer, ArrayList<Double>>();
-		String[] cityAttributes = {"ID","NAME", "ORIG", "POP", "SPOP", "QUOTA_1", "VIOL_1", "ECON_1", "FAMILY_1"};
+		String[] cityAttributes = {"ID","NAME_1", "ORIG", "POP", "SPOP", "QUOTA_1", "VIOL_1", "ECON_1", "FAMILY_1"};
 		String[] roadAttributes = {"ID", "FR", "TO", "SPEED_1", "POP", "COST_1", "TLEVEL_1", "DEATHS_1","LENGTH_1"};
 		
         //age_dist = new HashMap<Integer, ArrayList<Double>>();
@@ -91,11 +91,22 @@ class MigrationBuilder {
 	    //}
 	    makeCities(migrationSim.cityPoints, migrationSim.cityGrid, migrationSim.cities,migrationSim.cityList);
 	    extractFromRoadLinks(migrationSim.roadLinks, migrationSim);
+
 	    //read in structures
         addRefugees();
+	   // printCities();
 	}
 	
-    public static class Node
+    private static void printCities() {
+		for (Object city: migrationSim.cities){
+			City c = (City)city;
+			System.out.format("Name: " + c.getName() + " Ref Pop: " + c.getRefugeePopulation());
+			System.out.println("\n");
+		}
+		
+	}
+
+	public static class Node
     {
         public Int2D location; 
 
@@ -136,7 +147,7 @@ class MigrationBuilder {
     		Point point = cities_vector.getGeometryLocation(cityinfo);
     		double x = point.getX(), y = point.getY();
     		int xint = (int) Math.floor(xcols * (x - xmin) / (xmax - xmin)), yint = (int) (ycols - Math.floor(ycols * (y - ymin) / (ymax - ymin))); // REMEMBER TO FLIP THE Y VALUE
-    		//String name = cityinfo.getStringAttribute("NAME_1");
+    		String name = cityinfo.getStringAttribute("NAME_1");
     		int ID = cityinfo.getIntegerAttribute("ID");
     		int origin = cityinfo.getIntegerAttribute("ORIG");
 	    	double scaledPop = cityinfo.getDoubleAttribute("SPOP");
@@ -147,7 +158,7 @@ class MigrationBuilder {
 	    	double familyPresence = cityinfo.getDoubleAttribute("FAMILY_1");
 	    	Int2D location = new Int2D(xint, yint);
     	
-	    	City city = new City(location, ID, origin, scaledPop, pop, quota, violence, economy, familyPresence);
+	    	City city = new City(location, ID, name, origin, scaledPop, pop, quota, violence, economy, familyPresence);
 	    	addTo.add(city);
 	    	cityList.put(ID,city);
 	        grid.setObjectLocation(city, location);
@@ -179,17 +190,18 @@ class MigrationBuilder {
            for (Object c : migrationSim.cities){
         	   
         	   City city = (City)c;
-        	   System.out.println("city ID = " + city.getID());
+        	   System.out.println("city Name = " + city.getName());
            // InputStream inputstream = new FileInputStream(pop_file);
            
         	if (city.getOrigin() == 1){
                 int currentPop = 0;//1,4,5,10,3,14,24
 	            while  (currentPop + 5 <= city.getQuota()){//max family size here: 5
-		            ArrayList<Refugee> r = createRefugeeFamily(city.getLocation(), city);
+		            ArrayList<Refugee> r = createRefugeeFamily(city);
 	            	for (Refugee refugee: r){
 	            		currentPop++;
 	            		city.addMember(refugee);
-		            	//System.out.println(city.getRefugees());
+	            		//System.out.println(refugee.getHome().getName());
+		            	//System.out.println(city.getRefugeePP);
 	            		migrationSim.refugees.add(refugee);
 	            		migrationSim.schedule.scheduleRepeating(refugee);
 	            		Int2D loc = city.getLocation();
@@ -203,13 +215,10 @@ class MigrationBuilder {
 	            
 	         }
 
-
-            
-            
-           }
+         }
     }
     
-    private static ArrayList<Refugee> createRefugeeFamily(Int2D location, City city)
+    private static ArrayList<Refugee> createRefugeeFamily(City city)
     {
 
     	//generate family
@@ -228,8 +237,7 @@ class MigrationBuilder {
 	        int age = 0; //pick_age(age_dist, City city);
 	        double finStatus = pick_fin_status();
 	        //
-	        Refugee refugee = new Refugee(location, finStatus, sex, age, null);
-	
+	        Refugee refugee = new Refugee(city.getLocation(), city, finStatus, sex, age, null);
 	        refugeeFamily.add(refugee);
     	}
     	

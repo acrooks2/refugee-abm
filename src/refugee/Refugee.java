@@ -26,9 +26,10 @@ class Refugee implements Steppable{
 	private City goal;
 	private Int2D position;
 	MersenneTwisterFast random ;
-	public Refugee(Int2D location, double finStatus, int sex, int age, ArrayList<Refugee> family)
+	public Refugee(Int2D location, City home, double finStatus, int sex, int age, ArrayList<Refugee> family)
     {
        this.location = location;
+       this.home = home;
        this.sex = sex;
        this.age = age;
        this.family = family;
@@ -44,7 +45,7 @@ class Refugee implements Steppable{
 		 if(healthStatus == Constants.DEAD)
 	        {
 	            return;
-	            //change color, or indicate dead
+	            //change color in UI, or indicate dead
 	        }
 		 else if (finStatus == 0.0){
 			 return;
@@ -127,6 +128,22 @@ class Refugee implements Steppable{
 	 
 	 public void setAge(int age){
 		 this.age = age;
+	 }
+	 
+	 public void setHome(City home){
+		 this.home = home;
+	 }
+	 
+	 public City getGoal(){
+		 return goal;
+	 }
+	 
+	 public void setGoal(City goal){
+		 this.goal = goal;
+	 }
+	 
+	 public City getHome(){
+		 return home;
 	 }
 	 
 	 public int getSex(){

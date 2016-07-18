@@ -172,6 +172,7 @@ public class MigrationWithUI extends GUIState
             public void draw (Object object, Graphics2D graphics, DrawInfo2D info)
             {
                 Refugee refugee = (Refugee)object;
+                //System.out.println(refugee);
                 paint = new Color(255, 20, 215);
                 super.draw(object, graphics, info);
             }
