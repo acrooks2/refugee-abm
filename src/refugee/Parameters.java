@@ -26,7 +26,7 @@ class Parameters {
 	 //public static String CITY_INFO = "data/csvs/cityinfo.csv";
 	 //public static String AGE_DIST_PATH = "";//have, but only take columns that say TOT
 	 public static String ROAD_SHP = "data/shapefiles/roadsatt2.shp";//shapefile
-	 public static String CITY_SHP = "data/shapefiles/cityatt4.shp";//have
+	 public static String CITY_SHP = "data/shapefiles/cityatt7.shp";//have
 	 //Edge attributes
 	 
 	//population flow parameters

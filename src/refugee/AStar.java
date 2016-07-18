@@ -28,14 +28,14 @@ public class AStar {
 
         // containers for the metainformation about the Citys relative to the 
         // A* search
-        HashMap<City, AStarCityWrapper> foundCitys =
+        HashMap<City, AStarCityWrapper> foundCities =
                 new HashMap<City, AStarCityWrapper>();
 
 
         AStarCityWrapper startCity = new AStarCityWrapper(start);
         AStarCityWrapper goalCity = new AStarCityWrapper(goal);
-        foundCitys.put(start, startCity);
-        foundCitys.put(goal, goalCity);
+        foundCities.put(start, startCity);
+        foundCities.put(goal, goalCity);
 
         startCity.gx = 0;
         startCity.hx = heuristic(start, goal);
@@ -73,11 +73,11 @@ public class AStar {
 
                 // get the A* meta information about this City
                 AStarCityWrapper nextCity;
-                if( foundCitys.containsKey(n))
-                    nextCity = foundCitys.get(n);
+                if( foundCities.containsKey(n))
+                    nextCity = foundCities.get(n);
                 else{
                     nextCity = new AStarCityWrapper(n);
-                    foundCitys.put( n, nextCity );
+                    foundCities.put( n, nextCity );
                 }
 
                 if(closedSet.contains(nextCity)) // it has already been considered
@@ -113,10 +113,10 @@ public class AStar {
                 }
             }
 
-//            if(foundCitys.size()%10000 == 0)
+//            if(foundCities.size()%10000 == 0)
 //                System.out.println("Time = " + System.currentTimeMillis());
         }
-        //System.out.println("Searched " + foundCitys.size() + " Citys but could not find it");
+        //System.out.println("Searched " + foundCities.size() + " Citys but could not find it");
         return null;
     }
 
@@ -142,14 +142,14 @@ public class AStar {
 
         // containers for the metainformation about the Citys relative to the
         // A* search
-        HashMap<MigrationBuilder.City, AStarCityWrapper> foundCitys =
+        HashMap<MigrationBuilder.City, AStarCityWrapper> foundCities =
                 new HashMap<MigrationBuilder.City, AStarCityWrapper>();
 
 
         AStarCityWrapper startCity = new AStarCityWrapper(start);
         //AStarCityWrapper goalCity = new AStarCityWrapper(goal);
-        foundCitys.put(start, startCity);
-        //foundCitys.put(goal, goalCity);
+        foundCities.put(start, startCity);
+        //foundCities.put(goal, goalCity);
 
         startCity.gx = 0;
         startCity.hx = 0;
@@ -198,11 +198,11 @@ public class AStar {
 
                 // get the A* meta information about this City
                 AStarCityWrapper nextCity;
-                if( foundCitys.containsKey(n))
-                    nextCity = foundCitys.get(n);
+                if( foundCities.containsKey(n))
+                    nextCity = foundCities.get(n);
                 else{
                     nextCity = new AStarCityWrapper(n);
-                    foundCitys.put( n, nextCity );
+                    foundCities.put( n, nextCity );
                 }
 
                 if(closedSet.contains(nextCity)) // it has already been considered
@@ -230,10 +230,10 @@ public class AStar {
                 }
             }
 
-//            if(foundCitys.size()%10000 == 0)
+//            if(foundCities.size()%10000 == 0)
 //                System.out.println("Time = " + System.currentTimeMillis());
         }
-        //System.out.println("Searched " + foundCitys.size() + " Citys but could not find it");
+        //System.out.println("Searched " + foundCities.size() + " Citys but could not find it");
         return null;
     }
 
@@ -258,14 +258,14 @@ public class AStar {
 
         // containers for the metainformation about the Citys relative to the
         // A* search
-        HashMap<City, AStarCityWrapper> foundCitys =
+        HashMap<City, AStarCityWrapper> foundCities =
                 new HashMap<City, AStarCityWrapper>();
 
 
         AStarCityWrapper startCity = new AStarCityWrapper(start);
         //AStarCityWrapper goalCity = new AStarCityWrapper(goal);
-        foundCitys.put(start, startCity);
-        //foundCitys.put(goal, goalCity);
+        foundCities.put(start, startCity);
+        //foundCities.put(goal, goalCity);
 
         startCity.gx = 0;
         startCity.hx = 0;
@@ -315,11 +315,11 @@ public class AStar {
 
                 // get the A* meta information about this City
                 AStarCityWrapper nextCity;
-                if( foundCitys.containsKey(n))
-                    nextCity = foundCitys.get(n);
+                if( foundCities.containsKey(n))
+                    nextCity = foundCities.get(n);
                 else{
                     nextCity = new AStarCityWrapper(n);
-                    foundCitys.put( n, nextCity );
+                    foundCities.put( n, nextCity );
                 }
 
                 if(closedSet.contains(nextCity)) // it has already been considered
@@ -347,10 +347,10 @@ public class AStar {
                 }
             }
 
-//            if(foundCitys.size()%10000 == 0)
+//            if(foundCities.size()%10000 == 0)
 //                System.out.println("Time = " + System.currentTimeMillis());
         }
-        //System.out.println("Searched " + foundCitys.size() + " Citys but could not find it");
+        //System.out.println("Searched " + foundCities.size() + " Citys but could not find it");
         return CitiesToReturn;
     }
 
@@ -374,14 +374,14 @@ public class AStar {
 
         // containers for the metainformation about the Citys relative to the
         // A* search
-        HashMap<City, AStarCityWrapper> foundCitys =
+        HashMap<City, AStarCityWrapper> foundCities =
                 new HashMap<City, AStarCityWrapper>();
 
 
         AStarCityWrapper startCity = new AStarCityWrapper(start);
         //AStarCityWrapper goalCity = new AStarCityWrapper(goal);
-        foundCitys.put(start, startCity);
-        //foundCitys.put(goal, goalCity);
+        foundCities.put(start, startCity);
+        //foundCities.put(goal, goalCity);
 
         startCity.gx = 0;
         startCity.hx = 0;
@@ -423,11 +423,11 @@ public class AStar {
 
                 // get the A* meta information about this City
                 AStarCityWrapper nextCity;
-                if( foundCitys.containsKey(n))
-                    nextCity = foundCitys.get(n);
+                if( foundCities.containsKey(n))
+                    nextCity = foundCities.get(n);
                 else{
                     nextCity = new AStarCityWrapper(n);
-                    foundCitys.put( n, nextCity );
+                    foundCities.put( n, nextCity );
                 }
 
                 if(closedSet.contains(nextCity)) // it has already been considered
@@ -455,10 +455,10 @@ public class AStar {
                 }
             }
 
-//            if(foundCitys.size()%10000 == 0)
+//            if(foundCities.size()%10000 == 0)
 //                System.out.println("Time = " + System.currentTimeMillis());
         }
-        //System.out.println("Searched " + foundCitys.size() + " Citys but could not find it");
+        //System.out.println("Searched " + foundCities.size() + " Citys but could not find it");
         return null;
     }
 

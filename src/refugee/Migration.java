@@ -75,7 +75,10 @@ class Migration extends SimState{
     	super.start();
     	refugees = new Bag();
     	MigrationBuilder.initializeWorld(this);
-    	
+    	for (Object city: cities){
+    		City c = (City)city;
+    		System.out.println("Pop in this city: " + c.getRefugeePopulation());
+    	}
     	
     	
     	//charts

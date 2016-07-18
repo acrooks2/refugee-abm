@@ -28,6 +28,7 @@ import sim.field.network.Edge;
 import sim.field.network.Network;
 import sim.io.geo.ShapeFileImporter;
 import sim.util.Bag;
+import sim.util.Double2D;
 import sim.util.Int2D;
 import sim.util.geo.MasonGeometry;
 import net.sf.csv4j.*;
@@ -57,7 +58,7 @@ class MigrationBuilder {
 	 */
 		migrationSim = sim;
 	//    age_dist = new HashMap<Integer, ArrayList<Double>>();
-		String[] cityAttributes = {"ID","NAME", "ORIG", "POP", "QUOTA", "VIOL_1", "ECON_1", "FAMILY_1"};
+		String[] cityAttributes = {"ID","NAME", "ORIG", "POP", "SPOP", "QUOTA_1", "VIOL_1", "ECON_1", "FAMILY_1"};
 		String[] roadAttributes = {"ID", "FR", "TO", "SPEED_1", "POP", "COST_1", "TLEVEL_1", "DEATHS_1","LENGTH_1"};
 		
         //age_dist = new HashMap<Integer, ArrayList<Double>>();
@@ -91,7 +92,7 @@ class MigrationBuilder {
 	    makeCities(migrationSim.cityPoints, migrationSim.cityGrid, migrationSim.cities,migrationSim.cityList);
 	    extractFromRoadLinks(migrationSim.roadLinks, migrationSim);
 	    //read in structures
-        addCitiesandRefugees();
+        addRefugees();
 	}
 	
     public static class Node
@@ -120,35 +121,36 @@ class MigrationBuilder {
     }
     
     static void makeCities(GeomVectorField cities_vector, SparseGrid2D grid, Bag addTo,Map<Integer, City> cityList){
-    Bag cities = cities_vector.getGeometries();
+    	Bag cities = cities_vector.getGeometries();
     
-    Envelope e = cities_vector.getMBR();
-    double xmin = e.getMinX(), ymin = e.getMinY(), xmax = e.getMaxX(), ymax = e.getMaxY();
-    int xcols = migrationSim.world_width - 1, ycols = migrationSim.world_height - 1;
-    System.out.println("Reading in Cities");
+    	Envelope e = cities_vector.getMBR();
+    	double xmin = e.getMinX(), ymin = e.getMinY(), xmax = e.getMaxX(), ymax = e.getMaxY();
+    	int xcols = migrationSim.world_width - 1, ycols = migrationSim.world_height - 1;
+    	System.out.println("Reading in Cities");
     	for (int i = 0; i < cities.size(); i++)
     	{
-    	MasonGeometry cityinfo= (MasonGeometry)cities.objs[i];
+    		MasonGeometry cityinfo= (MasonGeometry)cities.objs[i];
     	
 		//String[] cityAttributes = {"ID","NAME", "ORIG_1", "POP", "QUOTA", "VIOL_1", "ECON_1", "FAMILY_1"};
     	
-    	 Point point = cities_vector.getGeometryLocation(cityinfo);
-         double x = point.getX(), y = point.getY();
-         int xint = (int) Math.floor(xcols * (x - xmin) / (xmax - xmin)), yint = (int) (ycols - Math.floor(ycols * (y - ymin) / (ymax - ymin))); // REMEMBER TO FLIP THE Y VALUE
-        //String name = cityinfo.getStringAttribute("NAME_1");
-    	int ID = cityinfo.getIntegerAttribute("ID");
-    	int origin = cityinfo.getIntegerAttribute("ORIG");
-    	double population = cityinfo.getDoubleAttribute("POP");
-    	int quota = cityinfo.getIntegerAttribute("QUOTA");
-    	double violence = cityinfo.getDoubleAttribute("VIOL_1");
-    	double economy = cityinfo.getDoubleAttribute("ECON_1");
-    	double familyPresence = cityinfo.getDoubleAttribute("FAMILY_1");
-    	Int2D location = new Int2D(xint, yint);
+    		Point point = cities_vector.getGeometryLocation(cityinfo);
+    		double x = point.getX(), y = point.getY();
+    		int xint = (int) Math.floor(xcols * (x - xmin) / (xmax - xmin)), yint = (int) (ycols - Math.floor(ycols * (y - ymin) / (ymax - ymin))); // REMEMBER TO FLIP THE Y VALUE
+    		//String name = cityinfo.getStringAttribute("NAME_1");
+    		int ID = cityinfo.getIntegerAttribute("ID");
+    		int origin = cityinfo.getIntegerAttribute("ORIG");
+	    	double scaledPop = cityinfo.getDoubleAttribute("SPOP");
+	    	int pop = cityinfo.getIntegerAttribute("POP");
+	    	int quota = cityinfo.getIntegerAttribute("QUOTA_1");
+	    	double violence = cityinfo.getDoubleAttribute("VIOL_1");
+	    	double economy = cityinfo.getDoubleAttribute("ECON_1");
+	    	double familyPresence = cityinfo.getDoubleAttribute("FAMILY_1");
+	    	Int2D location = new Int2D(xint, yint);
     	
-    	City city = new City(location, ID, origin, population, quota, violence, economy, familyPresence);
-    	addTo.add(city);
-    	cityList.put(ID,city);
-        grid.setObjectLocation(city, location);
+	    	City city = new City(location, ID, origin, scaledPop, pop, quota, violence, economy, familyPresence);
+	    	addTo.add(city);
+	    	cityList.put(ID,city);
+	        grid.setObjectLocation(city, location);
     	}
     }
     static void readInShapefile(String[] files, Bag[] attfiles, GeomVectorField[] vectorFields)
@@ -170,9 +172,10 @@ class MigrationBuilder {
         }
     }
     
-    private static void addCitiesandRefugees() 
+    private static void addRefugees() 
     {
-        System.out.println("Adding cities ");
+        System.out.println("Adding Refugees ");
+    	migrationSim.world = new Continuous2D(Parameters.WORLD_DISCRETIZTION, Parameters.WORLD_TO_POP_SCALE, Parameters.WORLD_TO_POP_SCALE); //TODO set this correctly
            for (Object c : migrationSim.cities){
         	   
         	   City city = (City)c;
@@ -181,18 +184,26 @@ class MigrationBuilder {
            
         	if (city.getOrigin() == 1){
                 int currentPop = 0;//1,4,5,10,3,14,24
-	            ArrayList<Refugee> r = createRefugeeFamily(city.getLocation(), city);
-	            while  (currentPop  <= city.getQuota()){
+	            while  (currentPop + 5 <= city.getQuota()){//max family size here: 5
+		            ArrayList<Refugee> r = createRefugeeFamily(city.getLocation(), city);
 	            	for (Refugee refugee: r){
+	            		currentPop++;
 	            		city.addMember(refugee);
+		            	//System.out.println(city.getRefugees());
 	            		migrationSim.refugees.add(refugee);
 	            		migrationSim.schedule.scheduleRepeating(refugee);
+	            		Int2D loc = city.getLocation();
+                        double y_coord = (loc.y*Parameters.WORLD_TO_POP_SCALE) + (int)(migrationSim.random.nextDouble() * Parameters.WORLD_TO_POP_SCALE);
+                        double x_coord = (loc.x*Parameters.WORLD_TO_POP_SCALE) + (int)(migrationSim.random.nextDouble() * Parameters.WORLD_TO_POP_SCALE);
+                        migrationSim.world.setObjectLocation(r, new Double2D(x_coord, y_coord));
+                        migrationSim.total_pop++;
 	            	}
-	            	currentPop += r.size();
+
 	            }
 	            
 	         }
-        	migrationSim.world = new Continuous2D(Parameters.WORLD_DISCRETIZTION, Parameters.WORLD_TO_POP_SCALE, Parameters.WORLD_TO_POP_SCALE); //TODO set this correctly
+
+
             
             
            }
@@ -226,8 +237,9 @@ class MigrationBuilder {
     		refugee.setFamily(refugeeFamily); // TODO - remove yourself?
     	}
     	
-    	
+    	//System.out.println(refugeeFamily);
     	return refugeeFamily;
+    
     	
     	
     }

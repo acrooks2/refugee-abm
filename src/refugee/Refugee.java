@@ -53,8 +53,7 @@ class Refugee implements Steppable{
 			 ArrayList<City> citylist = null; //change later when cities included in map
 		     City goalCity = calcGoalCity(citylist);
 		     if(this.location != goalCity.getLocation()){
-				 //AStar determine route
-		    	 setGoal(currentcity, goalCity, Parameters.WALKING_SPEED);
+		    	 setGoal(currentcity, goalCity, Parameters.WALKING_SPEED);//Astar inside here
 	             if(route == null)
 	                 return;
 	             if(routePosition < route.getNumSteps())

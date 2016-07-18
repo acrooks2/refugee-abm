@@ -134,19 +134,29 @@ public class MigrationWithUI extends GUIState
                 super.draw(object, graphics, info);
             }
         });
+        
+        
         */
-        GeomVectorFieldPortrayal citiesportrayal = new GeomVectorFieldPortrayal();
+        //---------------------Adding the cities portrayal------------------------------
+        /*GeomVectorFieldPortrayal citiesportrayal = new GeomVectorFieldPortrayal();
         citiesportrayal.setField(((Migration) state).cityPoints);
         //roadLinkPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(0.42f, 0.42f, 0.42f, 0.5f), 2.0, true));
         citiesportrayal.setPortrayalForAll(new GeomPortrayal(new Color(0, 0, 255), 2.0, true));
         
-        display.attach(citiesportrayal, "Cities");
+        display.attach(citiesportrayal, "Cities");*/
+        
+        FieldPortrayal2D cityPortrayal = new SparseGridPortrayal2D();
+        cityPortrayal.setField(((Migration)state).cityGrid);
+        cityPortrayal.setPortrayalForAll(new RectanglePortrayal2D(new Color(255, 154, 146), 1.0, false));
+        display.attach(cityPortrayal, "Cities");
 
 //        FieldPortrayal2D urbanPortrayal = new SparseGridPortrayal2D();
 //        urbanPortrayal.setField(((EbolaABM)state).urbanAreasGrid);
 //        urbanPortrayal.setPortrayalForAll(new RectanglePortrayal2D(new Color(255, 21, 19), 1.0, false));
 //        display.attach(urbanPortrayal, "Urban Area");
 
+        
+        
         //---------------------Adding the road portrayal------------------------------
         GeomVectorFieldPortrayal roadLinkPortrayal = new GeomVectorFieldPortrayal();
         roadLinkPortrayal.setField(((Migration) state).roadLinks);
