@@ -38,7 +38,7 @@ import org.apache.commons.math3.distribution.NormalDistribution;
 class MigrationBuilder {
     public static Migration migrationSim;
     private static NormalDistribution nd = new NormalDistribution(Parameters.AVG_FAMILY_SIZE, Parameters.FAMILY_SIZE_SD);
-    //private static HashMap<Integer, ArrayList<Double>> age_dist;
+    private static HashMap<Integer, ArrayList<Double>> age_dist;
 
     //public static HashSet<Geometry> removeGeometry = new HashSet<Geometry>();
     //public static HashSet<LineString> allLineStrings = new HashSet<LineString>();
@@ -51,7 +51,7 @@ class MigrationBuilder {
 
 		migrationSim = sim;
 		
-	//    age_dist = new HashMap<Integer, ArrayList<Double>>();
+	    age_dist = new HashMap<Integer, ArrayList<Double>>();
 		String[] cityAttributes = {"ID","NAME_1", "ORIG", "POP", "SPOP", "QUOTA_1", "VIOL_1", "ECON_1", "FAMILY_1"};
 		String[] roadAttributes = {"ID", "FR", "TO", "SPEED_1", "POP", "COST_1", "TLEVEL_1", "DEATHS_1","LENGTH_1"};
 	//	migrationSim.worldPopResolution = new SparseGrid2D();
@@ -86,7 +86,7 @@ class MigrationBuilder {
 	    //}
 	    makeCities(migrationSim.cityPoints, migrationSim.cityGrid, migrationSim.cities,migrationSim.cityList);
 	    extractFromRoadLinks(migrationSim.roadLinks, migrationSim);
-
+        setUpAgeDist(Parameters.AGE_DIST);
 	    //read in structures
         addRefugees();
 	   // printCities();
@@ -193,6 +193,7 @@ class MigrationBuilder {
 	           // while  (currentPop + 5 <= city.getQuota()){//max family size here: 5
                 while  (currentPop <= 20) { //test refugee points 
 		            RefugeeFamily r = createRefugeeFamily(city);
+		            System.out.println(r.getFamily().size());
 	            	for (Refugee refugee: r.getFamily()){
 	            		currentPop++;
 	            		city.addMember(refugee);
@@ -235,7 +236,8 @@ class MigrationBuilder {
 	            sex = Constants.FEMALE;
 	
 	        //now get age
-	        int age = 0; //pick_age(age_dist, City city);
+	        int age = pick_age(age_dist, city.getID());
+	        //System.out.println("" + age);
 
 	        //
 	        Refugee refugee = new Refugee(sex, age, refugeeFamily);
@@ -249,22 +251,30 @@ class MigrationBuilder {
     	
     	
     }
-    /*
-    private static int pick_age(HashMap<Integer, ArrayList<Double>> age_dist, int county_id)
+    
+    private static int pick_age(HashMap<Integer, ArrayList<Double>> age_dist, int cityid)
     {
-        double rand = migrationSim.random.nextDouble();
         //if(county_id == -9999)
            // county_id = Parameters.MIN_LIB_COUNTY_ID;
-        ArrayList<Double> dist = age_dist.get(county_id);
-        int i;
-        for(i = 0; i < dist.size(); i++)
-        {
-            if(rand < dist.get(i))
-                break;
+    	int category = 0;
+    	double rand = migrationSim.random.nextDouble();
+        ArrayList<Double> dist = age_dist.get(cityid);
+        for (int i = 1; i < 4; i++){
+        	if (rand >= dist.get(i-1) && rand <= dist.get(i)){
+        		category = i;
+                System.out.println("" + category);
+        		break; //TODO DOES THIS ACTUALLY BREAK
+        	}
         }
-        int age = i*5 + migrationSim.random.nextInt(5);
-        //System.out.println(age + " years");
-        return age;
+
+        switch (category) {
+        case 0:  return migrationSim.random.nextInt(5); //0-4
+        case 1:  return migrationSim.random.nextInt(13) + 5; //5-17
+        case 2:  return migrationSim.random.nextInt(42) + 18; //18-59
+        case 3:  return migrationSim.random.nextInt(41) + 60; //60+
+        default: return 0;
+        }
+
     }
     
     private static void setUpAgeDist(String age_dist_file)
@@ -278,25 +288,24 @@ class MigrationBuilder {
             while(!line.isEmpty())
             {
                 //read in the county ids
-                int county_id = NumberFormat.getNumberInstance(java.util.Locale.US).parse(line.get(0)).intValue();
+                int city_id = NumberFormat.getNumberInstance(java.util.Locale.US).parse(line.get(0)).intValue();
                 //relevant info is from 5 - 21
                 ArrayList<Double> list = new ArrayList<Double>();
-                //double sum = 0;
-                for(int i = 5; i <= 21; i++)
+                double sum = 0;
+                for(int i = 1; i <= 4; i++)
                 {
-                    list.add(Double.parseDouble(line.get(i)));
-                    //sum += Double.parseDouble(line.get(i));
-                    //Use cumulative probability
-                    if(i != 5)
-                        list.set(i-5, list.get(i-5) + list.get(i-5 - 1));
-                    //System.out.print(list.get(i-5));
+                	double percentage = Double.parseDouble(line.get(i));
+                	sum += percentage;
+                    list.add(sum);
                 }
                 //System.out.println("sum = " + sum);
                 //System.out.println();
                 //now add it to the hashmap
-                age_dist.put(county_id, list);
+                age_dist.put(city_id, list);
+
                 line = csvReader.readLine();
             }
+            System.out.println(age_dist);
         }
         catch(FileNotFoundException e)
         {
@@ -311,7 +320,7 @@ class MigrationBuilder {
             e.printStackTrace();
         }
     }
- 	*/
+ 	
     private static double pick_fin_status() {
 		// TODO Auto-generated method stub
 		return 1.0;

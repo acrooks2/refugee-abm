@@ -30,6 +30,7 @@ class Parameters {
 	 //public static String AGE_DIST_PATH = "";//have, but only take columns that say TOT
 	 public static String ROAD_SHP = "data/shapefiles/roadsatt2.shp";//shapefile
 	 public static String CITY_SHP = "data/shapefiles/cityatt7.shp";//have
+	 public static String AGE_DIST = "data/csvs/age_dist2.csv";//have
 	 //Edge attributes
 	 
 	//population flow parameters

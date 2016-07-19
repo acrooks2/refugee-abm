@@ -88,12 +88,13 @@ class Migration extends SimState{
             public void step(SimState simState)
             {
             	long cStep = simState.schedule.getSteps();
-
-                /* refugee decides on goal
-                 * refugee decides on a route
-                 * move the refugee
-                 * 
-                 */
+            	/*charts
+            	 *deaths over time
+            	 *average distance traveled
+            	 *number reaching goal (without running out of money or dying*
+            	 *money over time
+            	 *after closing off, change of course
+            	 */
             }
         };
         this.schedule.scheduleRepeating(chartUpdater);
