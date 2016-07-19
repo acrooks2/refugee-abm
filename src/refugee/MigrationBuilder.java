@@ -33,10 +33,11 @@ import sim.util.Double2D;
 import sim.util.Int2D;
 import sim.util.geo.MasonGeometry;
 import net.sf.csv4j.*;
+import org.apache.commons.math3.distribution.NormalDistribution;
 
 class MigrationBuilder {
     public static Migration migrationSim;
-    
+    private static NormalDistribution nd = new NormalDistribution(Parameters.AVG_FAMILY_SIZE, Parameters.FAMILY_SIZE_SD);
     //private static HashMap<Integer, ArrayList<Double>> age_dist;
 
     //public static HashSet<Geometry> removeGeometry = new HashSet<Geometry>();
@@ -47,21 +48,13 @@ class MigrationBuilder {
 	//public static void initializeWorld(Migration sim, String popPath, String adminPath, String ageDistPath){
     
     public static void initializeWorld(Migration sim){	
-	/*
-	 *     private double distance;
-    private MigrationBuilder.Node start;
-    private MigrationBuilder.Node end;
-    private double speed;
-    private int population;
-    private double cost;
-    private double transportLevel; 
-    private double deaths; 
-	 */
+
 		migrationSim = sim;
+		
 	//    age_dist = new HashMap<Integer, ArrayList<Double>>();
 		String[] cityAttributes = {"ID","NAME_1", "ORIG", "POP", "SPOP", "QUOTA_1", "VIOL_1", "ECON_1", "FAMILY_1"};
 		String[] roadAttributes = {"ID", "FR", "TO", "SPEED_1", "POP", "COST_1", "TLEVEL_1", "DEATHS_1","LENGTH_1"};
-		
+	//	migrationSim.worldPopResolution = new SparseGrid2D();
         //age_dist = new HashMap<Integer, ArrayList<Double>>();
 		migrationSim.world_height = 500; //9990;  //TODO - set correct size
 		migrationSim.world_width = 500; //9390;	//TODO - set correct size
@@ -193,7 +186,6 @@ class MigrationBuilder {
            for (Object c : migrationSim.cities){
         	   
         	   City city = (City)c;
-        	   System.out.println("city Name = " + city.getName());
            // InputStream inputstream = new FileInputStream(pop_file);
            
         	if (city.getOrigin() == 1){
@@ -230,7 +222,7 @@ class MigrationBuilder {
     {
 
     	//generate family
-    	int familySize = 5; //pickFamilySize(age_dist, city); // TODO - set family size
+    	int familySize = pickFamilySize(); 
         double finStatus = pick_fin_status();
     	RefugeeFamily refugeeFamily = new RefugeeFamily(city.getLocation(), familySize, city, finStatus);
     	for (int i = 0; i < familySize; i++){
@@ -324,9 +316,9 @@ class MigrationBuilder {
 		// TODO Auto-generated method stub
 		return 1.0;
 	}
-	private static int pickFamilySize(HashMap<Integer, ArrayList<Double>> age_dist, City city) {
-		// TODO Auto-generated method stub
-		return 0;
+	private static int pickFamilySize() {
+		int familySize = (int) Math.round(nd.sample());
+		return familySize;
 	}
     
 	static void extractFromRoadLinks(GeomVectorField roadLinks, Migration migrationSim)
@@ -355,6 +347,7 @@ class MigrationBuilder {
          	
          	// build road network
          	migrationSim.roadNetwork.addEdge(migrationSim.cityList.get(from) , migrationSim.cityList.get(to), edgeinfo);
+         	migrationSim.roadNetwork.addEdge(migrationSim.cityList.get(to), migrationSim.cityList.get(from), edgeinfo);
          	
         /* 	
             if (gm.getGeometry() instanceof LineString)

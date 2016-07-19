@@ -29,13 +29,15 @@ class RefugeeFamily implements Steppable{
        this.home = home;
        this.finStatus = finStatus;
        familyMembers = new ArrayList<Refugee>();
-           
+       currentcity = home;
+     //  routePosition = 0;
     }
 	
 	 @Override
 	    public void step(SimState state)
 	    {
-		 
+		 random = new MersenneTwisterFast();
+		 //System.out.println("here");
 	        Migration migrationSim = (Migration) state;
 	        for (Refugee r: familyMembers){
 	   		 if(r.getHealthStatus() == Constants.DEAD)
@@ -49,19 +51,23 @@ class RefugeeFamily implements Steppable{
 			 return;
 		 }
 		 else{
-			 ArrayList<City> citylist = null; //change later when cities included in map
-		     City goalCity = calcGoalCity(citylist);
-		     System.out.println("Home");
+			 Bag cities = migrationSim.cities; //change later when cities included in map
+		     City goalCity = calcGoalCity(cities);
+		     for (Object c: cities){
+		    	 City city = (City) c;
+		    	 if (this.location == city.getLocation()){
+		    		 currentcity = city;
+		    	 }
+		     }
+		    System.out.println("Home: "+ this.getHome().getName() + " Goal "+ goalCity.getName());
+		    System.out.println("Current: "+ currentcity.getName());
 		     if(this.location != goalCity.getLocation()){
 		    	 setGoal(currentcity, goalCity, Parameters.WALKING_SPEED);//Astar inside here
 	             if(route == null)
 	                 return;
-	             if(routePosition < route.getNumSteps())
-	                {
-	                    Int2D nextStep = route.getLocation(routePosition++);
-	                    this.setLocation(nextStep);
-	                    updatePositionOnMap(migrationSim);
-	                }
+	             Int2D nextStep = route.getLocation(1);
+	             this.setLocation(nextStep);
+	             updatePositionOnMap(migrationSim);
 		     }
 			
 		 }
@@ -69,18 +75,19 @@ class RefugeeFamily implements Steppable{
 	 
 	 
 	 
-	 public City calcGoalCity(ArrayList<City> citylist){ //returns the best city
+	 public City calcGoalCity(Bag citylist){ //returns the best city
 		 City bestCity = null;
-		 double max = Double.POSITIVE_INFINITY;
-		 for (City city: citylist){
-			 double cityDesirability = dangerCare()*city.getViolence() 
-					 + familyAbroadCare()*city.getFamilyPresence() 
-					 + city.getEconomy() + city.getPopulation();
-			 if (city.getRefugeePopulation() + familyMembers.size() >= city.getQuota()) //if reached quota, desirability is 0 
+		 double max = 0.0;
+		 for (Object city: citylist){
+			 City c = (City)city;
+			 double cityDesirability = dangerCare()*c.getViolence() 
+					 + familyAbroadCare()*c.getFamilyPresence() 
+					 + c.getEconomy() + c.getPopulation();
+			 if (c.getRefugeePopulation() + familyMembers.size() >= c.getQuota()) //if reached quota, desirability is 0 
 				 cityDesirability = 0;
 			 if (cityDesirability > max){				 
 				 max = cityDesirability;
-				 bestCity = city;
+				 bestCity = c;
 			 }
 			 
 		 }
@@ -99,8 +106,9 @@ class RefugeeFamily implements Steppable{
 	    {
 	        double randX = migrationSim.random.nextDouble();
 	        double randY = migrationSim.random.nextDouble();
+	        System.out.println("Location: " + location.getX() + " "+ location.getY());
 	        migrationSim.world.setObjectLocation(this, new Double2D(location.getX() + randX, location.getY() + randY));
-	        migrationSim.worldPopResolution.setObjectLocation(this, location.getX()/10, location.getY()/10);
+	//        migrationSim.worldPopResolution.setObjectLocation(this, (int)location.getX()/10, (int)location.getY()/10);
 	    }
 	 
 	 

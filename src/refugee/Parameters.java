@@ -2,6 +2,9 @@ package refugee;
 
 class Parameters {
 	 public static double TEMPORAL_RESOLUTION = 1;//steps per hour
+	 //----Refugee Characteristic Weights----//
+	 public static double AVG_FAMILY_SIZE = 6.3; //http://www.acted.org/en/food-security-situation-and-livelihood-intervention-opportunities-syrians-refugees-and-host-communit
+	 public static double FAMILY_SIZE_SD = 2.92; //same as above
 	 //-------Agent Care Weights-------//
 	 public static double DANGER_CARE_WEIGHT = 0.2;
 	 public static double FAMILY_ABROAD_CARE_WEIGHT = 0.2;

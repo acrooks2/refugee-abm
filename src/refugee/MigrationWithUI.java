@@ -62,6 +62,8 @@ public class MigrationWithUI extends GUIState
         c.registerFrame(displayFrame);
         displayFrame.setVisible(true);
         displayFrame.setSize(1870, 1280);
+        
+     //   ((Console) c).pressPlay();
     }
 
     @Override
@@ -184,6 +186,7 @@ public class MigrationWithUI extends GUIState
                 super.draw(object, graphics, info);
                 super.filled = true;
                 super.scale = 5;
+                super.draw(object, graphics, info);
             }
         });
         

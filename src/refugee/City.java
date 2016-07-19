@@ -156,7 +156,7 @@ class City {
 	    
 	    public Route getRoute(City destination, double speed, RefugeeFamily refugeeFamily)
 	    {
-	        if(cachedPaths.containsKey(destination))//means we have this path cached
+	        /*if(cachedPaths.containsKey(destination))//means we have this path cached
 	        {
 	            Route route = cachedPaths.get(destination);
 	            return route;
@@ -169,13 +169,13 @@ class City {
 	                Route route;
 	                if(destination.getRoute(this, speed, refugeeFamily) != null)
 	                    route = destination.getRoute(this, speed, refugeeFamily).reverse();//be sure to reverse the route
-	                else
+	                elseX
 	                    route = null;
 	                cachedPaths.put(destination, route);
 	                return route;
 	            }
 	            else
-	            {
+	            {*/
 	                Route route;
 	               /* if(this.getLocation().distance(destination.getLocation()) > Parameters.convertFromKilometers(80))
 	                {
@@ -185,11 +185,12 @@ class City {
 	                }
 	                else*/
 	                    route = AStar.astarPath(this, destination, speed, refugeeFamily);
-	                cachedPaths.put(destination, route);
+	                    System.out.println(route.getNumSteps());
+	                //cachedPaths.put(destination, route);
 	                return route;
 	            }
-	        }
-	    }
+	        //}
+	   // }
 	 //include route saver - route from this city to another, but personalized (each agent)
 	    
 }

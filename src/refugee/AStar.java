@@ -128,7 +128,7 @@ public class AStar {
      * @param check_capacity determines whether we chceck the capacity of Structure
      * @return
      */
-  /*  public static Route getNearestCity(MigrationBuilder.City start, Map<MigrationBuilder.City, List<Structure>> endCitys, double max_distance, boolean check_capacity, double speed)
+   /*public static Route getNearestCity(MigrationBuilder.City start, Map<MigrationBuilder.City, List<Structure>> endCitys, double max_distance, boolean check_capacity, double speed)
     {
         //        int[] cacheKey = new int[] {start.location.xLoc, start.location.yLoc, goal.location.xLoc, goal.location.yLoc};
 //        if (cache.containsKey(cacheKey))
@@ -484,8 +484,14 @@ public class AStar {
 
         //start by adding the last one
         result.add(0, x.city.location);
+        
+        while (x.city != start.city){
+        	x = x.cameFrom;
+        	result.add(0, x.city.location);
+        	
+        }
 
-        if(x.cameFrom != null)
+        /*if(x.cameFrom != null)
         {
             x = x.cameFrom;
 
@@ -506,9 +512,9 @@ public class AStar {
                 if(x != null && x.cameFrom != null)
                     totalDistance += x.city.location.distance(x.cameFrom.city.location);
             }
-        }
+        }*/
 
-        result.add(0, start.city.location);
+       // result.add(0, start.city.location);
         return new Route(result, totalDistance, start.city, end.city, Parameters.WALKING_SPEED);
     }
     
