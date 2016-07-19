@@ -27,6 +27,7 @@ import sim.field.grid.SparseGrid2D;
 import sim.field.network.Edge;
 import sim.field.network.Network;
 import sim.io.geo.ShapeFileImporter;
+import sim.portrayal.grid.SparseGridPortrayal2D;
 import sim.util.Bag;
 import sim.util.Double2D;
 import sim.util.Int2D;
@@ -62,13 +63,14 @@ class MigrationBuilder {
 		String[] roadAttributes = {"ID", "FR", "TO", "SPEED_1", "POP", "COST_1", "TLEVEL_1", "DEATHS_1","LENGTH_1"};
 		
         //age_dist = new HashMap<Integer, ArrayList<Double>>();
-		migrationSim.world_height = 9990;  //TODO - set correct size
-		migrationSim.world_width = 9390;	//TODO - set correct size
+		migrationSim.world_height = 500; //9990;  //TODO - set correct size
+		migrationSim.world_width = 500; //9390;	//TODO - set correct size
 
 		migrationSim.roadNetwork = new Network();
 		migrationSim.allRoadNodes = new SparseGrid2D(sim.world_width, sim.world_height);
 
 		migrationSim.roadLinks = new GeomVectorField(sim.world_width, sim.world_height);
+		//migrationSim.roadLinks = new GeomVectorField(1,1);
 	    Bag roadAtt = new Bag(roadAttributes);
 	    
 
@@ -186,7 +188,8 @@ class MigrationBuilder {
     private static void addRefugees() 
     {
         System.out.println("Adding Refugees ");
-    	migrationSim.world = new Continuous2D(Parameters.WORLD_DISCRETIZTION, Parameters.WORLD_TO_POP_SCALE, Parameters.WORLD_TO_POP_SCALE); //TODO set this correctly
+    	migrationSim.world = new Continuous2D(Parameters.WORLD_DISCRETIZTION, migrationSim.world_width, migrationSim.world_height); //TODO set this correctly
+    	migrationSim.world2 = new SparseGrid2D(migrationSim.world_width, migrationSim.world_height);
            for (Object c : migrationSim.cities){
         	   
         	   City city = (City)c;
@@ -195,21 +198,26 @@ class MigrationBuilder {
            
         	if (city.getOrigin() == 1){
                 int currentPop = 0;//1,4,5,10,3,14,24
-	            while  (currentPop + 5 <= city.getQuota()){//max family size here: 5
-		            ArrayList<Refugee> r = createRefugeeFamily(city);
-	            	for (Refugee refugee: r){
+	           // while  (currentPop + 5 <= city.getQuota()){//max family size here: 5
+                while  (currentPop <= 20) { //test refugee points 
+		            RefugeeFamily r = createRefugeeFamily(city);
+	            	for (Refugee refugee: r.getFamily()){
 	            		currentPop++;
 	            		city.addMember(refugee);
 	            		//System.out.println(refugee.getHome().getName());
 		            	//System.out.println(city.getRefugeePP);
 	            		migrationSim.refugees.add(refugee);
-	            		migrationSim.schedule.scheduleRepeating(refugee);
 	            		Int2D loc = city.getLocation();
                         double y_coord = (loc.y*Parameters.WORLD_TO_POP_SCALE) + (int)(migrationSim.random.nextDouble() * Parameters.WORLD_TO_POP_SCALE);
                         double x_coord = (loc.x*Parameters.WORLD_TO_POP_SCALE) + (int)(migrationSim.random.nextDouble() * Parameters.WORLD_TO_POP_SCALE);
                         migrationSim.world.setObjectLocation(r, new Double2D(x_coord, y_coord));
+                        int y_coordint = loc.y + (int)((migrationSim.random.nextDouble() - 0.5) * 10);
+                        int x_coordint = loc.x + (int)((migrationSim.random.nextDouble() - 0.5 ) * 10);
+            
+                        migrationSim.world2.setObjectLocation(r,new Int2D (x_coordint, y_coordint));
                         migrationSim.total_pop++;
 	            	}
+            		migrationSim.schedule.scheduleRepeating(r);
 
 	            }
 	            
@@ -218,13 +226,14 @@ class MigrationBuilder {
          }
     }
     
-    private static ArrayList<Refugee> createRefugeeFamily(City city)
+    private static RefugeeFamily createRefugeeFamily(City city)
     {
 
     	//generate family
-    	int family = 5; //pickFamilySize(age_dist, city); // TODO - set family size
-    	ArrayList<Refugee> refugeeFamily = new ArrayList<Refugee>(family);
-    	for (int i = 0; i < family; i++){
+    	int familySize = 5; //pickFamilySize(age_dist, city); // TODO - set family size
+        double finStatus = pick_fin_status();
+    	RefugeeFamily refugeeFamily = new RefugeeFamily(city.getLocation(), familySize, city, finStatus);
+    	for (int i = 0; i < familySize; i++){
     		 	
 	        //first pick sex
 	        int sex;
@@ -235,15 +244,12 @@ class MigrationBuilder {
 	
 	        //now get age
 	        int age = 0; //pick_age(age_dist, City city);
-	        double finStatus = pick_fin_status();
+
 	        //
-	        Refugee refugee = new Refugee(city.getLocation(), city, finStatus, sex, age, null);
-	        refugeeFamily.add(refugee);
+	        Refugee refugee = new Refugee(sex, age, refugeeFamily);
+	        refugeeFamily.getFamily().add(refugee);
     	}
     	
-    	for (Refugee refugee: refugeeFamily){
-    		refugee.setFamily(refugeeFamily); // TODO - remove yourself?
-    	}
     	
     	//System.out.println(refugeeFamily);
     	return refugeeFamily;
@@ -316,7 +322,7 @@ class MigrationBuilder {
  	*/
     private static double pick_fin_status() {
 		// TODO Auto-generated method stub
-		return 0;
+		return 1.0;
 	}
 	private static int pickFamilySize(HashMap<Integer, ArrayList<Double>> age_dist, City city) {
 		// TODO Auto-generated method stub

@@ -21,6 +21,8 @@ import sim.portrayal.continuous.ContinuousPortrayal2D;
 import sim.portrayal.geo.GeomPortrayal;
 import sim.portrayal.geo.GeomVectorFieldPortrayal;
 import sim.portrayal.grid.SparseGridPortrayal2D;
+import sim.portrayal.simple.CircledPortrayal2D;
+import sim.portrayal.simple.HexagonalPortrayal2D;
 import sim.portrayal.simple.OvalPortrayal2D;
 import sim.portrayal.simple.RectanglePortrayal2D;
 import sim.util.geo.MasonGeometry;
@@ -52,14 +54,14 @@ public class MigrationWithUI extends GUIState
         ((Console)c).setLocation(0, 680);
 
 
-        display = new Display2D(1180, 1180, this); //creates the display
+        display = new Display2D(1180, 960, this); //creates the display
         //display.setRefresRate(32);
         //display.setScale(2);
 
         displayFrame = display.createFrame();
         c.registerFrame(displayFrame);
         displayFrame.setVisible(true);
-        displayFrame.setSize(1870, 1180);
+        displayFrame.setSize(1870, 1280);
     }
 
     @Override
@@ -147,8 +149,11 @@ public class MigrationWithUI extends GUIState
         
         FieldPortrayal2D cityPortrayal = new SparseGridPortrayal2D();
         cityPortrayal.setField(((Migration)state).cityGrid);
-        cityPortrayal.setPortrayalForAll(new RectanglePortrayal2D(new Color(255, 154, 146), 1.0, false));
+        cityPortrayal.setPortrayalForAll(new OvalPortrayal2D(new Color(255, 154, 146), 10.0, false));
         display.attach(cityPortrayal, "Cities");
+        
+        //HexagonalPortrayal2D
+        //OvalPortrayal2D
 
 //        FieldPortrayal2D urbanPortrayal = new SparseGridPortrayal2D();
 //        urbanPortrayal.setField(((EbolaABM)state).urbanAreasGrid);
@@ -161,7 +166,7 @@ public class MigrationWithUI extends GUIState
         GeomVectorFieldPortrayal roadLinkPortrayal = new GeomVectorFieldPortrayal();
         roadLinkPortrayal.setField(((Migration) state).roadLinks);
         //roadLinkPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(0.42f, 0.42f, 0.42f, 0.5f), 2.0, true));
-        roadLinkPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(216, 10, 255), 0.1, true));
+        roadLinkPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(216, 10, 255), 1, true));
         display.attach(roadLinkPortrayal, "Roads");
 
         ContinuousPortrayal2D refugeePortrayal = new ContinuousPortrayal2D();
@@ -169,15 +174,27 @@ public class MigrationWithUI extends GUIState
         refugeePortrayal.setField(((Migration)this.state).world);
         refugeePortrayal.setPortrayalForAll(new OvalPortrayal2D()
         {
+        	 @Override
             public void draw (Object object, Graphics2D graphics, DrawInfo2D info)
             {
+            	
                 Refugee refugee = (Refugee)object;
-                //System.out.println(refugee);
+                System.out.println(refugee);
                 paint = new Color(255, 20, 215);
                 super.draw(object, graphics, info);
+                super.filled = true;
+                super.scale = 5;
             }
         });
-        display.attach(refugeePortrayal, "Refugees");
+        
+        //test refugees show home location only
+        FieldPortrayal2D cityPortrayal2 = new SparseGridPortrayal2D();
+        cityPortrayal2.setField(((Migration)state).world2);
+        cityPortrayal2.setPortrayalForAll(new OvalPortrayal2D(new Color(255, 10, 146), 3.0, true));
+        display.attach(cityPortrayal2, "Cities");
+        
+        
+       // display.attach(refugeePortrayal, "Refugees");
 
         //will need
       /*  GeomVectorFieldPortrayal boundaryPortrayal = new GeomVectorFieldPortrayal();

@@ -133,10 +133,6 @@ class City {
 		 refugees.add(r);
 	 }
 
-	 public HashSet<Refugee> getMembers()
-	 {
-	    return refugees;
-	 }
 	 
 	    public void setNearestNode(MigrationBuilder.Node node)
 	    {
@@ -158,7 +154,7 @@ class City {
 	        return cachedPaths;
 	    }
 	    
-	    public Route getRoute(City destination, double speed, Refugee refugee)
+	    public Route getRoute(City destination, double speed, RefugeeFamily refugeeFamily)
 	    {
 	        if(cachedPaths.containsKey(destination))//means we have this path cached
 	        {
@@ -171,8 +167,8 @@ class City {
 	            if(destination.getCachedRoutes().containsKey(this))
 	            {
 	                Route route;
-	                if(destination.getRoute(this, speed, refugee) != null)
-	                    route = destination.getRoute(this, speed, refugee).reverse();//be sure to reverse the route
+	                if(destination.getRoute(this, speed, refugeeFamily) != null)
+	                    route = destination.getRoute(this, speed, refugeeFamily).reverse();//be sure to reverse the route
 	                else
 	                    route = null;
 	                cachedPaths.put(destination, route);
@@ -188,7 +184,7 @@ class City {
 	                    route = new Route(path, this.getLocation().distance(destination.getLocation()), this.getNearestNode(), destination.getNearestNode(), 10000);
 	                }
 	                else*/
-	                    route = AStar.astarPath(this, destination, speed, refugee);
+	                    route = AStar.astarPath(this, destination, speed, refugeeFamily);
 	                cachedPaths.put(destination, route);
 	                return route;
 	            }

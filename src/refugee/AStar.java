@@ -17,7 +17,7 @@ public class AStar {
      * @return
      */
 	public static Network roadNetwork = MigrationBuilder.migrationSim.roadNetwork;
-    static public Route astarPath(City start, City goal, double speed, Refugee refugee) {
+    static public Route astarPath(City start, City goal, double speed, RefugeeFamily refugee) {
 
 //       
         // initial check

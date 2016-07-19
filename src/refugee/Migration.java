@@ -5,9 +5,6 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultValueDataset;
 import org.jfree.data.xy.XYDataItem;
 import org.jfree.data.xy.XYSeries;
-
-//import EbolaABM.MovementPattern;
-//import EbolaABM.MovementPattern;
 import sim.engine.MakesSimState;
 import sim.engine.Schedule;
 import sim.engine.SimState;
@@ -30,6 +27,7 @@ import java.util.*;
 class Migration extends SimState{
 	
 	public Continuous2D world;
+	public SparseGrid2D world2;
     public SparseGrid2D worldPopResolution;//all agents within each km grid cell
     public SparseGrid2D cityGrid;
     public  Network roadNetwork = new Network();
