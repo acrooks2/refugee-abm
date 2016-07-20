@@ -19,7 +19,7 @@ class RefugeeFamily implements Steppable{
     private int routePosition;
 	private double finStatus;
 	private City home;
-	private City currentcity;
+	private City currentCity;
 	private City goal;
 	MersenneTwisterFast random ;
 	
@@ -29,7 +29,7 @@ class RefugeeFamily implements Steppable{
        this.home = home;
        this.finStatus = finStatus;
        familyMembers = new ArrayList<Refugee>();
-       currentcity = home;
+       currentCity = home;
      //  routePosition = 0;
     }
 	
@@ -56,18 +56,25 @@ class RefugeeFamily implements Steppable{
 		     for (Object c: cities){
 		    	 City city = (City) c;
 		    	 if (this.location == city.getLocation()){
-		    		 currentcity = city;
+		    		 currentCity = city;
 		    	 }
 		     }
 		    System.out.println("Home: "+ this.getHome().getName() + " Goal "+ goalCity.getName());
-		    System.out.println("Current: "+ currentcity.getName());
+		    System.out.println("Current: "+ currentCity.getName());
 		     if(this.location != goalCity.getLocation()){
-		    	 setGoal(currentcity, goalCity, Parameters.WALKING_SPEED);//Astar inside here
+		    	 setGoal(currentCity, goalCity);//Astar inside here
 	             if(route == null)
 	                 return;
+	             int index = route.getIndex(this.location);
+	             if (index != -1){//if already on the route (in between cities) 
+	            	 this.setLocation(route.getLocation(index + 1));
+		             updatePositionOnMap(migrationSim);
+	             }
+	             else{//new route
 	             Int2D nextStep = route.getLocation(1);
 	             this.setLocation(nextStep);
 	             updatePositionOnMap(migrationSim);
+	             }
 		     }
 			
 		 }
@@ -94,11 +101,10 @@ class RefugeeFamily implements Steppable{
 		 return bestCity;
 	 }
 	 
-	    private void setGoal(City from, City to, double speed)
+	    private void setGoal(City from, City to)
 	    {
 	        this.goal = to;
-	        if(speed < 20)
-	            this.route = from.getRoute(to, speed, this);
+	        this.route = from.getRoute(to, this);
 	        this.routePosition = 0;
 	    }
 	    
@@ -146,6 +152,10 @@ class RefugeeFamily implements Steppable{
 	 
 	 public City getHome(){
 		 return home;
+	 }
+	 
+	 public void setCurrent(City current){
+		 this.currentCity = current;
 	 }
 	 
 	 

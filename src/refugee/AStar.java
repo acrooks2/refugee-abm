@@ -17,7 +17,7 @@ public class AStar {
      * @return
      */
 	public static Network roadNetwork = MigrationBuilder.migrationSim.roadNetwork;
-    static public Route astarPath(City start, City goal, double speed, RefugeeFamily refugee) {
+    static public Route astarPath(City start, City goal, RefugeeFamily refugee) {
 
 //       
         // initial check
@@ -57,7 +57,7 @@ public class AStar {
             }
             if(x.city == goal ){ // we have found the shortest possible path to the goal!
                 // Reconstruct the path and send it back.
-                return reconstructRoute(goalCity, startCity, goalCity, speed);
+                return reconstructRoute(goalCity, startCity, goalCity, refugee);
             }
             openSet.remove(x); // maintain the lists
             openSetQueue.remove();
@@ -244,7 +244,7 @@ public class AStar {
      * @param max_distance the maximum distance you want to search in the road network
      * @return A list of Citys within the maximum distance sorted in ascending order by distance to start (index 0 means closest)
      */
-    public static List<City> getCitiesWithinDistance(City start, Map endCities, double max_distance, double speed)
+    public static List<City> getCitiesWithinDistance(City start, Map endCities, double max_distance, RefugeeFamily refugee)
     {
         //        int[] cacheKey = new int[] {start.location.xLoc, start.location.yLoc, goal.location.xLoc, goal.location.yLoc};
 //        if (cache.containsKey(cacheKey))
@@ -360,7 +360,7 @@ public class AStar {
      * @param distance the target distance to stop
      * @return
      */
-    public static Route getCityAtDistance(City start, double distance, double speed)
+    public static Route getCityAtDistance(City start, double distance, RefugeeFamily refugee)
     {
         //        int[] cacheKey = new int[] {start.location.xLoc, start.location.yLoc, goal.location.xLoc, goal.location.yLoc};
 //        if (cache.containsKey(cacheKey))
@@ -403,7 +403,7 @@ public class AStar {
             //check if we have reached maximum route distance
             if(x.hx > distance)////we are at the distance!!!
             {
-                return reconstructRoute(x, startCity, x, speed);
+                return reconstructRoute(x, startCity, x, refugee);
             }
             if(x == null)
             {
@@ -468,53 +468,68 @@ public class AStar {
      * @param n the end point of the path
      * @return an Route from start to goal
      */
-    static Route reconstructRoute(AStarCityWrapper n, AStarCityWrapper start, AStarCityWrapper end, double speed)
+    static Route reconstructRoute(AStarCityWrapper n, AStarCityWrapper start, AStarCityWrapper end, RefugeeFamily refugee)
     {
         List<Int2D> result = new ArrayList<>(20);
 
-        //adjust speed to temporal resolution
-        speed *= Parameters.TEMPORAL_RESOLUTION;//now km per step
 
-        //convert speed to cell block per step
-        speed = Parameters.convertFromKilometers(speed);
-
-        double mod_speed = speed;//
+        //double mod_speed = speed;
         double totalDistance = 0;
         AStarCityWrapper x = n;
 
         //start by adding the last one
         result.add(0, x.city.location);
         
-        while (x.city != start.city){
+        /*while (x.city != start.city){
         	x = x.cameFrom;
         	result.add(0, x.city.location);
         	
-        }
+        }*/
 
-        /*if(x.cameFrom != null)
+        if(x.cameFrom != null)
         {
+            RoadInfo edge = (RoadInfo) roadNetwork.getEdge(x.cameFrom.city, x.city).getInfo();
+            double mod_speed = edge.getSpeed()*Parameters.TEMPORAL_RESOLUTION;//now km per step
+            //convert speed to cell block per step
+            mod_speed = Parameters.convertFromKilometers(mod_speed);
+           // System.out.println("" + mod_speed);
+            
             x = x.cameFrom;
-
+            
             while (x != null)
             {
+
                 double dist = x.city.location.distance(result.get(0));
 
-                while(mod_speed < dist)
+                while(dist > mod_speed)
                 {
+                	
                     result.add(0, getPointAlongLine(result.get(0), x.city.location, mod_speed/dist));
                     dist = x.city.location.distance(result.get(0));
-                    mod_speed = speed;
                 }
-                mod_speed -= dist;
+                //mod_speed -= dist;
+                
+                if (x.cameFrom != null){
+                	edge = (RoadInfo) roadNetwork.getEdge(x.cameFrom.city, x.city).getInfo();
+                mod_speed = edge.getSpeed()*Parameters.TEMPORAL_RESOLUTION;//now km per step
+                //convert speed to cell block per step
+                mod_speed = Parameters.convertFromKilometers(mod_speed);
+                }
+                
+                if (x.cameFrom == null){
+                	refugee.setCurrent(x.city);
+                }
 
                 x = x.cameFrom;
+
+
 
                 if(x != null && x.cameFrom != null)
                     totalDistance += x.city.location.distance(x.cameFrom.city.location);
             }
-        }*/
+        }
 
-       // result.add(0, start.city.location);
+        result.add(0, start.city.location);
         return new Route(result, totalDistance, start.city, end.city, Parameters.WALKING_SPEED);
     }
     

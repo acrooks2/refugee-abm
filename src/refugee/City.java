@@ -154,7 +154,7 @@ class City {
 	        return cachedPaths;
 	    }
 	    
-	    public Route getRoute(City destination, double speed, RefugeeFamily refugeeFamily)
+	    public Route getRoute(City destination, RefugeeFamily refugeeFamily)
 	    {
 	        /*if(cachedPaths.containsKey(destination))//means we have this path cached
 	        {
@@ -184,7 +184,7 @@ class City {
 	                    route = new Route(path, this.getLocation().distance(destination.getLocation()), this.getNearestNode(), destination.getNearestNode(), 10000);
 	                }
 	                else*/
-	                    route = AStar.astarPath(this, destination, speed, refugeeFamily);
+	                    route = AStar.astarPath(this, destination, refugeeFamily);
 	                    System.out.println(route.getNumSteps());
 	                //cachedPaths.put(destination, route);
 	                return route;

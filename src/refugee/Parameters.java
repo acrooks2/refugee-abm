@@ -1,7 +1,8 @@
 package refugee;
 
 class Parameters {
-	 public static double TEMPORAL_RESOLUTION = 1;//steps per hour
+	 public static double TEMPORAL_RESOLUTION = 0.3;//steps per hour
+	 public static int NUM_ORIG_REFUGEES = 50;
 	 //----Refugee Characteristic Weights----//
 	 public static double AVG_FAMILY_SIZE = 6.3; //http://www.acted.org/en/food-security-situation-and-livelihood-intervention-opportunities-syrians-refugees-and-host-communit
 	 public static double FAMILY_SIZE_SD = 2.92; //same as above
@@ -28,8 +29,9 @@ class Parameters {
 	 //public static String ROAD_INFO = "data/csvs/roadinfo.csv";
 	 //public static String CITY_INFO = "data/csvs/cityinfo.csv";
 	 //public static String AGE_DIST_PATH = "";//have, but only take columns that say TOT
+	 public static String REGION_SHP = "data/shapefiles/region.shp";//shapefile
 	 public static String ROAD_SHP = "data/shapefiles/roadsatt2.shp";//shapefile
-	 public static String CITY_SHP = "data/shapefiles/cityatt7.shp";//have
+	 public static String CITY_SHP = "data/shapefiles/cityatt.shp";//have
 	 public static String AGE_DIST = "data/csvs/age_dist2.csv";//have
 	 //Edge attributes
 	 

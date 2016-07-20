@@ -33,6 +33,10 @@ public class Route
         Int2D location = path.get(index);
         return location;
     }
+    
+    public int getIndex(Int2D location){
+    	return path.indexOf(location);
+    }
 
     public double getTotalDistance()
     {

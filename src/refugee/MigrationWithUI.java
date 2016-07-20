@@ -37,7 +37,11 @@ public class MigrationWithUI extends GUIState
 {
     Display2D display; //displaying the model
     JFrame displayFrame; //frame containing all the displays
-
+    FieldPortrayal2D cityPortrayal = new SparseGridPortrayal2D();
+    GeomVectorFieldPortrayal regionPortrayal = new GeomVectorFieldPortrayal();
+    GeomVectorFieldPortrayal roadLinkPortrayal = new GeomVectorFieldPortrayal();
+    ContinuousPortrayal2D refugeePortrayal = new ContinuousPortrayal2D();
+   // FieldPortrayal2D refugeePortrayal2 = new SparseGridPortrayal2D();
 
     public MigrationWithUI(Migration sim)
     {
@@ -54,14 +58,21 @@ public class MigrationWithUI extends GUIState
         ((Console)c).setLocation(0, 680);
 
 
-        display = new Display2D(1180, 960, this); //creates the display
+        display = new Display2D(1024, 760, this); //creates the display
         //display.setRefresRate(32);
-        //display.setScale(2);
-
+        display.setScale(1.2);
+        
+        display.attach(regionPortrayal, "Regions");
+        display.attach(roadLinkPortrayal, "Roads");
+        display.attach(cityPortrayal, "Cities");
+        display.attach(refugeePortrayal, "Refugees");
+      //  display.attach(refugeePortrayal2, "Refugees2");
+        
         displayFrame = display.createFrame();
         c.registerFrame(displayFrame);
         displayFrame.setVisible(true);
-        displayFrame.setSize(1870, 1280);
+        displayFrame.setSize(1280, 1024);
+
         
      //   ((Console) c).pressPlay();
     }
@@ -71,10 +82,12 @@ public class MigrationWithUI extends GUIState
     {
         super.start();
 
-        setupPortrayals();
+        setupFixedPortrayals();
+        setupMovingPortrayals();
     }
 
-    public void setupPortrayals()
+   
+    public void setupFixedPortrayals()
     {
 
       /*  GeomVectorFieldPortrayal adminShapePortrayal = new GeomVectorFieldPortrayal();
@@ -149,10 +162,10 @@ public class MigrationWithUI extends GUIState
         
         display.attach(citiesportrayal, "Cities");*/
         
-        FieldPortrayal2D cityPortrayal = new SparseGridPortrayal2D();
+        //FieldPortrayal2D cityPortrayal = new SparseGridPortrayal2D();
         cityPortrayal.setField(((Migration)state).cityGrid);
-        cityPortrayal.setPortrayalForAll(new OvalPortrayal2D(new Color(255, 154, 146), 10.0, false));
-        display.attach(cityPortrayal, "Cities");
+        cityPortrayal.setPortrayalForAll(new OvalPortrayal2D(new Color(255, 154, 146), 10.0, true));
+        //display.attach(cityPortrayal, "Cities");
         
         //HexagonalPortrayal2D
         //OvalPortrayal2D
@@ -163,39 +176,21 @@ public class MigrationWithUI extends GUIState
 //        display.attach(urbanPortrayal, "Urban Area");
 
         
+
+        
         
         //---------------------Adding the road portrayal------------------------------
-        GeomVectorFieldPortrayal roadLinkPortrayal = new GeomVectorFieldPortrayal();
+        //GeomVectorFieldPortrayal roadLinkPortrayal = new GeomVectorFieldPortrayal();
         roadLinkPortrayal.setField(((Migration) state).roadLinks);
         //roadLinkPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(0.42f, 0.42f, 0.42f, 0.5f), 2.0, true));
-        roadLinkPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(216, 10, 255), 1, true));
-        display.attach(roadLinkPortrayal, "Roads");
+        roadLinkPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(24, 28, 242), 1, true));
+        //display.attach(roadLinkPortrayal, "Roads");
 
-        ContinuousPortrayal2D refugeePortrayal = new ContinuousPortrayal2D();
-
-        refugeePortrayal.setField(((Migration)this.state).world);
-        refugeePortrayal.setPortrayalForAll(new OvalPortrayal2D()
-        {
-        	 @Override
-            public void draw (Object object, Graphics2D graphics, DrawInfo2D info)
-            {
-            	
-                Refugee refugee = (Refugee)object;
-                System.out.println(refugee);
-                paint = new Color(255, 20, 215);
-                super.draw(object, graphics, info);
-                super.filled = true;
-                super.scale = 5;
-                super.draw(object, graphics, info);
-            }
-        });
-        
-        //test refugees show home location only
-        FieldPortrayal2D cityPortrayal2 = new SparseGridPortrayal2D();
-        cityPortrayal2.setField(((Migration)state).world2);
-        cityPortrayal2.setPortrayalForAll(new OvalPortrayal2D(new Color(255, 10, 146), 3.0, true));
-        display.attach(cityPortrayal2, "Cities");
-        
+        //---------------------Adding the region portrayal------------------------------
+        //GeomVectorFieldPortrayal roadLinkPortrayal = new GeomVectorFieldPortrayal();
+        regionPortrayal.setField(((Migration) state).regions);
+        //roadLinkPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(0.42f, 0.42f, 0.42f, 0.5f), 2.0, true));
+        regionPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(188, 195, 196), 1, true));
         
        // display.attach(refugeePortrayal, "Refugees");
 
@@ -206,7 +201,34 @@ public class MigrationWithUI extends GUIState
         display.attach(boundaryPortrayal, "Boundaries");
         */
     }
-
+    
+    //display refresh each step
+    public void setupMovingPortrayals()
+    {
+         refugeePortrayal.setField(((Migration)this.state).world);
+        refugeePortrayal.setPortrayalForAll(new OvalPortrayal2D()
+        {
+        	 @Override
+            public void draw (Object object, Graphics2D graphics, DrawInfo2D info)
+            {
+            	
+                RefugeeFamily refugee = (RefugeeFamily)object;
+                //System.out.println(refugee);
+                paint = new Color(255, 20, 215);
+                super.draw(object, graphics, info);
+                super.filled = true;
+                super.scale = 5;
+                super.draw(object, graphics, info);
+            }
+        });
+        
+        
+        display.reset();
+        display.setBackdrop(Color.WHITE);
+        display.repaint();
+    }
+    
+  
     @Override
     public void quit()
     {

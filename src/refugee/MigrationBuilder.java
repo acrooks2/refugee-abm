@@ -54,6 +54,7 @@ class MigrationBuilder {
 	    age_dist = new HashMap<Integer, ArrayList<Double>>();
 		String[] cityAttributes = {"ID","NAME_1", "ORIG", "POP", "SPOP", "QUOTA_1", "VIOL_1", "ECON_1", "FAMILY_1"};
 		String[] roadAttributes = {"ID", "FR", "TO", "SPEED_1", "POP", "COST_1", "TLEVEL_1", "DEATHS_1","LENGTH_1"};
+		String[] regionAttributes = {"REGION", "SQKM"};
 	//	migrationSim.worldPopResolution = new SparseGrid2D();
         //age_dist = new HashMap<Integer, ArrayList<Double>>();
 		migrationSim.world_height = 500; //9990;  //TODO - set correct size
@@ -66,7 +67,9 @@ class MigrationBuilder {
 		//migrationSim.roadLinks = new GeomVectorField(1,1);
 	    Bag roadAtt = new Bag(roadAttributes);
 	    
-
+		migrationSim.regions = new GeomVectorField(sim.world_width, sim.world_height);
+	    Bag regionAtt = new Bag(regionAttributes);
+	    
 	    migrationSim.cityPoints = new GeomVectorField(sim.world_width, sim.world_height);
 	    Bag cityAtt = new Bag(cityAttributes);
 	    
@@ -74,10 +77,20 @@ class MigrationBuilder {
 	    //Bag cityAtt = new Bag(cityAttributes);
 	    
 	    //try{
-	    String[] files = {Parameters.ROAD_SHP, Parameters.CITY_SHP};//shapefiles
-	    Bag[] attfiles = {roadAtt, cityAtt};
-	    GeomVectorField[] vectorFields = {migrationSim.roadLinks, migrationSim.cityPoints};
+	    String[] files = {Parameters.REGION_SHP, Parameters.ROAD_SHP, Parameters.CITY_SHP};//shapefiles
+	    Bag[] attfiles = {regionAtt, roadAtt, cityAtt};
+	    GeomVectorField[] vectorFields = {migrationSim.regions, migrationSim.roadLinks, migrationSim.cityPoints};
 	    readInShapefile(files, attfiles, vectorFields);//read in attributes
+	    
+	    //expand the extent to include all features
+	    Envelope MBR = migrationSim.regions.getMBR();
+	    MBR.expandToInclude(migrationSim.roadLinks.getMBR());
+	    MBR.expandToInclude(migrationSim.cityPoints.getMBR());
+	    
+	    migrationSim.regions.setMBR(MBR);
+	    migrationSim.roadLinks.setMBR(MBR);
+	    migrationSim.cityPoints.setMBR(MBR);
+	    
 	    //InputStream inputStream = new FileInputStream();//COMMENT OUT to change inputter
 	    //}
 	    //catch(FileNotFoundException e)
@@ -130,6 +143,7 @@ class MigrationBuilder {
     	Bag cities = cities_vector.getGeometries();
     
     	Envelope e = cities_vector.getMBR();
+    	//Envelope e = migrationSim.regions.getMBR();
     	double xmin = e.getMinX(), ymin = e.getMinY(), xmax = e.getMaxX(), ymax = e.getMaxY();
     	int xcols = migrationSim.world_width - 1, ycols = migrationSim.world_height - 1;
     	System.out.println("Reading in Cities");
@@ -182,7 +196,7 @@ class MigrationBuilder {
     {
         System.out.println("Adding Refugees ");
     	migrationSim.world = new Continuous2D(Parameters.WORLD_DISCRETIZTION, migrationSim.world_width, migrationSim.world_height); //TODO set this correctly
-    	migrationSim.world2 = new SparseGrid2D(migrationSim.world_width, migrationSim.world_height);
+    	//migrationSim.world2 = new SparseGrid2D(migrationSim.world_width, migrationSim.world_height);
            for (Object c : migrationSim.cities){
         	   
         	   City city = (City)c;
@@ -191,7 +205,7 @@ class MigrationBuilder {
         	if (city.getOrigin() == 1){
                 int currentPop = 0;//1,4,5,10,3,14,24
 	           // while  (currentPop + 5 <= city.getQuota()){//max family size here: 5
-                while  (currentPop <= 20) { //test refugee points 
+                while  (currentPop <= Parameters.NUM_ORIG_REFUGEES) { //test refugee points 
 		            RefugeeFamily r = createRefugeeFamily(city);
 		            System.out.println(r.getFamily().size());
 	            	for (Refugee refugee: r.getFamily()){
@@ -204,10 +218,10 @@ class MigrationBuilder {
                         double y_coord = (loc.y*Parameters.WORLD_TO_POP_SCALE) + (int)(migrationSim.random.nextDouble() * Parameters.WORLD_TO_POP_SCALE);
                         double x_coord = (loc.x*Parameters.WORLD_TO_POP_SCALE) + (int)(migrationSim.random.nextDouble() * Parameters.WORLD_TO_POP_SCALE);
                         migrationSim.world.setObjectLocation(r, new Double2D(x_coord, y_coord));
-                        int y_coordint = loc.y + (int)((migrationSim.random.nextDouble() - 0.5) * 10);
-                        int x_coordint = loc.x + (int)((migrationSim.random.nextDouble() - 0.5 ) * 10);
+                        int y_coordint = loc.y + (int)((migrationSim.random.nextDouble() - 0.5) * 5);
+                        int x_coordint = loc.x + (int)((migrationSim.random.nextDouble() - 0.5 ) * 5);
             
-                        migrationSim.world2.setObjectLocation(r,new Int2D (x_coordint, y_coordint));
+                       // migrationSim.world2.setObjectLocation(r,new Int2D (x_coordint, y_coordint));
                         migrationSim.total_pop++;
 	            	}
             		migrationSim.schedule.scheduleRepeating(r);
@@ -334,6 +348,7 @@ class MigrationBuilder {
     {
         Bag geoms = roadLinks.getGeometries();
         Envelope e = roadLinks.getMBR();
+        //Envelope e = migrationSim.regions.getMBR();
         double xmin = e.getMinX(), ymin = e.getMinY(), xmax = e.getMaxX(), ymax = e.getMaxY();
         int xcols = migrationSim.world_width - 1, ycols = migrationSim.world_height - 1;
         int count = 0;
