@@ -164,7 +164,7 @@ public class MigrationWithUI extends GUIState
         
         //FieldPortrayal2D cityPortrayal = new SparseGridPortrayal2D();
         cityPortrayal.setField(((Migration)state).cityGrid);
-        cityPortrayal.setPortrayalForAll(new OvalPortrayal2D(new Color(255, 154, 146), 10.0, true));
+        cityPortrayal.setPortrayalForAll(new OvalPortrayal2D(new Color(255, 154, 146), 7.0, true));
         //display.attach(cityPortrayal, "Cities");
         
         //HexagonalPortrayal2D
@@ -217,7 +217,7 @@ public class MigrationWithUI extends GUIState
                 paint = new Color(255, 20, 215);
                 super.draw(object, graphics, info);
                 super.filled = true;
-                super.scale = 5;
+                super.scale = 3;
                 super.draw(object, graphics, info);
             }
         });

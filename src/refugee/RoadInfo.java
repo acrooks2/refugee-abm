@@ -52,6 +52,11 @@ class RoadInfo
         return distance;
     }
     
+    public double getWeightedDistance(){
+    	
+    	return (this.distance-Parameters.MIN_EDGE_LENGTH)/(Parameters.MAX_EDGE_LENGTH-Parameters.MIN_EDGE_LENGTH);
+    }
+    
     public double getSpeed()
     {
         return speed;

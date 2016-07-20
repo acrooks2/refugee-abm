@@ -35,7 +35,10 @@ class EdgeInfo
         Int2D location = path.get(index);
         return location;
     }*/
-
+    public double getWeightedDistance(){
+    	
+    	return (this.distance-Parameters.MIN_EDGE_LENGTH)/(Parameters.MAX_EDGE_LENGTH-Parameters.MIN_EDGE_LENGTH);
+    }
     public double getDistance()
     {
         return distance;

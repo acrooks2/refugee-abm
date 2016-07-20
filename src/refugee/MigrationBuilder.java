@@ -52,8 +52,8 @@ class MigrationBuilder {
 		migrationSim = sim;
 		
 	    age_dist = new HashMap<Integer, ArrayList<Double>>();
-		String[] cityAttributes = {"ID","NAME_1", "ORIG", "POP", "SPOP", "QUOTA_1", "VIOL_1", "ECON_1", "FAMILY_1"};
-		String[] roadAttributes = {"ID", "FR", "TO", "SPEED_1", "POP", "COST_1", "TLEVEL_1", "DEATHS_1","LENGTH_1"};
+		String[] cityAttributes = {"ID","NAME_1", "ORIG", "POP", "SPOP", "QUOTA_1", "VIOL", "ECON", "FAMILY_1"};
+		String[] roadAttributes = {"ID", "FR", "TO", "SPEED_1", "POP", "COST_1", "TLEVEL_1", "DEATH","LENGTH_1"};
 		String[] regionAttributes = {"REGION", "SQKM"};
 	//	migrationSim.worldPopResolution = new SparseGrid2D();
         //age_dist = new HashMap<Integer, ArrayList<Double>>();
@@ -162,8 +162,8 @@ class MigrationBuilder {
 	    	double scaledPop = cityinfo.getDoubleAttribute("SPOP");
 	    	int pop = cityinfo.getIntegerAttribute("POP");
 	    	int quota = cityinfo.getIntegerAttribute("QUOTA_1");
-	    	double violence = cityinfo.getDoubleAttribute("VIOL_1");
-	    	double economy = cityinfo.getDoubleAttribute("ECON_1");
+	    	double violence = cityinfo.getDoubleAttribute("VIOL");
+	    	double economy = cityinfo.getDoubleAttribute("ECON");
 	    	double familyPresence = cityinfo.getDoubleAttribute("FAMILY_1");
 	    	Int2D location = new Int2D(xint, yint);
     	
@@ -218,8 +218,8 @@ class MigrationBuilder {
                         double y_coord = (loc.y*Parameters.WORLD_TO_POP_SCALE) + (int)(migrationSim.random.nextDouble() * Parameters.WORLD_TO_POP_SCALE);
                         double x_coord = (loc.x*Parameters.WORLD_TO_POP_SCALE) + (int)(migrationSim.random.nextDouble() * Parameters.WORLD_TO_POP_SCALE);
                         migrationSim.world.setObjectLocation(r, new Double2D(x_coord, y_coord));
-                        int y_coordint = loc.y + (int)((migrationSim.random.nextDouble() - 0.5) * 5);
-                        int x_coordint = loc.x + (int)((migrationSim.random.nextDouble() - 0.5 ) * 5);
+                        int y_coordint = loc.y + (int)((migrationSim.random.nextDouble() - 0.5) * 3);
+                        int x_coordint = loc.x + (int)((migrationSim.random.nextDouble() - 0.5 ) * 3);
             
                        // migrationSim.world2.setObjectLocation(r,new Int2D (x_coordint, y_coordint));
                         migrationSim.total_pop++;
@@ -365,7 +365,7 @@ class MigrationBuilder {
          	double distance = gm.getDoubleAttribute("LENGTH_1");
          	double cost = gm.getDoubleAttribute("COST_1");
          	double transportlevel = gm.getDoubleAttribute("TLEVEL_1");
-         	double deaths = gm.getDoubleAttribute("DEATHS_1");
+         	double deaths = gm.getDoubleAttribute("DEATH");
          	
          	RoadInfo edgeinfo = new RoadInfo(gm.geometry,from, to, speed, distance, cost, transportlevel, deaths);
          	

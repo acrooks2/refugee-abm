@@ -43,41 +43,39 @@ class RefugeeFamily implements Steppable{
 	   		 if(r.getHealthStatus() == Constants.DEAD)
 		        {
 		            return;
-		            //change color in UI, or indicate dead
 		        }
 	        }
 
-		 if (finStatus == 0.0){
-			 return;
-		 }
-		 else{
-			 Bag cities = migrationSim.cities; //change later when cities included in map
-		     City goalCity = calcGoalCity(cities);
-		     for (Object c: cities){
-		    	 City city = (City) c;
-		    	 if (this.location == city.getLocation()){
-		    		 currentCity = city;
-		    	 }
-		     }
-		    System.out.println("Home: "+ this.getHome().getName() + " Goal "+ goalCity.getName());
-		    System.out.println("Current: "+ currentCity.getName());
-		     if(this.location != goalCity.getLocation()){
-		    	 setGoal(currentCity, goalCity);//Astar inside here
-	             if(route == null)
-	                 return;
-	             int index = route.getIndex(this.location);
-	             if (index != -1){//if already on the route (in between cities) 
-	            	 this.setLocation(route.getLocation(index + 1));
-		             updatePositionOnMap(migrationSim);
-	             }
-	             else{//new route
-	             Int2D nextStep = route.getLocation(1);
-	             this.setLocation(nextStep);
-	             updatePositionOnMap(migrationSim);
-	             }
-		     }
-			
-		 }
+	        if (finStatus == 0.0){
+	        	return;
+	        }
+	        else{
+				 Bag cities = migrationSim.cities; //change later when cities included in map
+			     City goalCity = calcGoalCity(cities);
+			     for (Object c: cities){
+			    	 City city = (City) c;
+			    	 if (this.location == city.getLocation()){
+			    		 currentCity = city;
+			    	 }
+			     }
+			    System.out.println("Home: "+ this.getHome().getName() + " Goal "+ goalCity.getName());
+			    //System.out.println("Current: "+ currentCity.getName());
+			     if(this.location != goalCity.getLocation()){
+			    	 setGoal(currentCity, goalCity);//Astar inside here
+		             if(route == null)
+		                 return;
+		             int index = route.getIndex(this.location);
+		             if (index != -1){//if already on the route (in between cities) 
+		            	 this.setLocation(route.getLocation(index + 1));
+			             updatePositionOnMap(migrationSim);
+		             }
+		             else{//new route
+			             Int2D nextStep = route.getLocation(1);
+			             this.setLocation(nextStep);
+			             updatePositionOnMap(migrationSim);
+		             	}
+			     	}
+	        	}	
 	    }
 	 
 	 
@@ -89,7 +87,7 @@ class RefugeeFamily implements Steppable{
 			 City c = (City)city;
 			 double cityDesirability = dangerCare()*c.getViolence() 
 					 + familyAbroadCare()*c.getFamilyPresence() 
-					 + c.getEconomy() + c.getPopulation();
+					 + c.getEconomy() + c.getScaledPopulation();
 			 if (c.getRefugeePopulation() + familyMembers.size() >= c.getQuota()) //if reached quota, desirability is 0 
 				 cityDesirability = 0;
 			 if (cityDesirability > max){				 
@@ -169,7 +167,7 @@ class RefugeeFamily implements Steppable{
 	    
 	 
 	 public double dangerCare(){//0-1, young, old, or has family weighted more
-		 double dangerCare = 1.0;
+		 double dangerCare = 0.5;
 		 for (Refugee r: familyMembers){
 		 if (r.getAge() < 12 || r.getAge() > 60){
 			 dangerCare += Parameters.DANGER_CARE_WEIGHT*random.nextDouble();

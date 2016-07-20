@@ -11,7 +11,7 @@ import sim.util.Int2D;
 public class AStar {
 
     /**
-     * Assumes that both the start and end location are CityS as opposed to LOCATIONS
+     * Assumes that both the start and end location are Cities as opposed to LOCATIONS
      * @param start
      * @param goal
      * @return
@@ -26,7 +26,7 @@ public class AStar {
             System.out.println("Error: invalid City provided to AStar");
         }
 
-        // containers for the metainformation about the Citys relative to the 
+        // containers for the metainformation about the Cities relative to the 
         // A* search
         HashMap<City, AStarCityWrapper> foundCities =
                 new HashMap<City, AStarCityWrapper>();
@@ -39,15 +39,15 @@ public class AStar {
 
         startCity.gx = 0;
         startCity.hx = heuristic(start, goal);
-        startCity.fx = heuristic(start, goal);
+        startCity.fx =  heuristic(start, goal);
 
-        // A* containers: allRoadCitys to be investigated, allRoadCitys that have been investigated
+        // A* containers: allRoadCities to be investigated, allRoadCities that have been investigated
         HashSet<AStarCityWrapper> closedSet = new HashSet<>(10000),
                 openSet = new HashSet<>(10000);
         PriorityQueue<AStarCityWrapper> openSetQueue = new PriorityQueue<>(10000);
         openSet.add(startCity);
         openSetQueue.add(startCity);
-        while(openSet.size() > 0){ // while there are reachable allRoadCitys to investigate
+        while(openSet.size() > 0){ // while there are reachable allRoadCities to investigate
 
             //AStarCityWrapper x = findMin(openSet); // find the shortest path so far
             AStarCityWrapper x = openSetQueue.peek();
@@ -71,7 +71,7 @@ public class AStar {
                 if( n == x.city )
                     n = (City) e.to();
 
-                // get the A* meta information about this City
+                // get the A* meta information about this City 
                 AStarCityWrapper nextCity;
                 if( foundCities.containsKey(n))
                     nextCity = foundCities.get(n);
@@ -85,7 +85,8 @@ public class AStar {
 
                 // otherwise evaluate the cost of this City/edge combo
                 RoadInfo edge = (RoadInfo)e.getInfo();
-        		double edgeweight = edge.getDistance() * Parameters.DISTANCE_WEIGHT 
+                //System.out.println(edge.getWeightedDistance());
+        		double edgeweight = edge.getWeightedDistance() * Parameters.DISTANCE_WEIGHT 
         				+ edge.getSpeed() * Parameters.SPEED_WEIGHT
         				+ edge.getPopulation() * Parameters.POP_WEIGHT
         				+ edge.getCost() * Parameters.COST_WEIGHT
@@ -109,141 +110,27 @@ public class AStar {
                 if(better){
                     nextCity.cameFrom = x;
                     nextCity.gx = tentativeCost;
-                    nextCity.fx = nextCity.gx + nextCity.hx;
+                    nextCity.fx = nextCity.gx +  nextCity.hx;
+                   // System.out.println("fx: " + nextCity.fx + "gx: " + nextCity.gx);
                 }
             }
 
 //            if(foundCities.size()%10000 == 0)
 //                System.out.println("Time = " + System.currentTimeMillis());
         }
-        //System.out.println("Searched " + foundCities.size() + " Citys but could not find it");
+        //System.out.println("Searched " + foundCities.size() + " Cities but could not find it");
         return null;
     }
 
+ 
     /**
-     * Uses Djikstra to find the closest in the list of endCitys.  Returns the endCity that is closest.
+     * Uses Djikstra to find all Cities within the distance that are a part of endCities.  Returns the list of endCities within the distance.
      * @param start
-     * @param endCitys
+     * @param endCities
      * @param max_distance the maximum distance you want to search in the road network
-     * @param check_capacity determines whether we chceck the capacity of Structure
-     * @return
+     * @return A list of Cities within the maximum distance sorted in ascending order by distance to start (index 0 means closest)
      */
-   /*public static Route getNearestCity(MigrationBuilder.City start, Map<MigrationBuilder.City, List<Structure>> endCitys, double max_distance, boolean check_capacity, double speed)
-    {
-        //        int[] cacheKey = new int[] {start.location.xLoc, start.location.yLoc, goal.location.xLoc, goal.location.yLoc};
-//        if (cache.containsKey(cacheKey))
-//            return cache.get(cacheKey);
-//
-        // initial check
-        long startTime = System.currentTimeMillis();
-        if (start == null || endCitys == null) {
-            System.out.println("Error: invalid City provided to AStar");
-        }
-
-        // containers for the metainformation about the Citys relative to the
-        // A* search
-        HashMap<MigrationBuilder.City, AStarCityWrapper> foundCities =
-                new HashMap<MigrationBuilder.City, AStarCityWrapper>();
-
-
-        AStarCityWrapper startCity = new AStarCityWrapper(start);
-        //AStarCityWrapper goalCity = new AStarCityWrapper(goal);
-        foundCities.put(start, startCity);
-        //foundCities.put(goal, goalCity);
-
-        startCity.gx = 0;
-        startCity.hx = 0;
-        startCity.fx = 0;
-
-        // A* containers: allRoadCitys to be investigated, allRoadCitys that have been investigated
-        HashSet<AStarCityWrapper> closedSet = new HashSet<>(),
-                openSet = new HashSet<>();
-        PriorityQueue<AStarCityWrapper> openSetQueue = new PriorityQueue<>(10000);
-
-
-        openSet.add(startCity);
-        openSetQueue.add(startCity);
-
-        while(openSet.size() > 0){ // while there are reachable allRoadCitys to investigate
-
-            //AStarCityWrapper x = findMin(openSet); // find the shortest path so far
-            AStarCityWrapper x = openSetQueue.peek();
-            //check if we have reached maximum route distance
-            if(x.hx > max_distance)
-                return null;
-            if(x == null)
-            {
-                AStarCityWrapper n = findMin(openSet);
-            }
-            if(endCitys.containsKey(x.City)){ // we have found the shortest possible path to the goal!
-                if(check_capacity)//check if this structure is already full!
-                {
-                    for(Structure structure: endCitys.get(x.City))
-                        if(!(structure.getMembers().size() >= structure.getCapacity()))//means it is not full
-                            return reconstructRoute(x, startCity, x, speed);
-                }
-                else // Reconstruct the path and send it back.
-                    return reconstructRoute(x, startCity, x, speed);
-            }
-            openSet.remove(x); // maintain the lists
-            openSetQueue.remove();
-            closedSet.add(x);
-
-            // check all the neighbors of this location
-            for(Edge l: x.City.links){
-
-                MigrationBuilder.City n = (MigrationBuilder.City) l.from();
-                if( n == x.City )
-                    n = (MigrationBuilder.City) l.to();
-
-                // get the A* meta information about this City
-                AStarCityWrapper nextCity;
-                if( foundCities.containsKey(n))
-                    nextCity = foundCities.get(n);
-                else{
-                    nextCity = new AStarCityWrapper(n);
-                    foundCities.put( n, nextCity );
-                }
-
-                if(closedSet.contains(nextCity)) // it has already been considered
-                    continue;
-
-                // otherwise evaluate the cost of this City/edge combo
-                double tentativeCost = x.gx +  l.getWeight();
-                boolean better = false;
-
-                if(! openSet.contains(nextCity)){
-                    openSet.add(nextCity);
-                    openSetQueue.add(nextCity);
-                    nextCity.hx = heuristic(x.City, nextCity.City) + x.hx;
-                    better = true;
-                }
-                else if(tentativeCost < nextCity.gx){
-                    better = true;
-                }
-
-                // store A* information about this promising candidate City
-                if(better){
-                    nextCity.cameFrom = x;
-                    nextCity.gx = tentativeCost;
-                    nextCity.fx = nextCity.gx + nextCity.hx;
-                }
-            }
-
-//            if(foundCities.size()%10000 == 0)
-//                System.out.println("Time = " + System.currentTimeMillis());
-        }
-        //System.out.println("Searched " + foundCities.size() + " Citys but could not find it");
-        return null;
-    }
-
-    /**
-     * Uses Djikstra to find all Citys within the distance that are a part of endCitys.  Returns the list of endCitys within the distance.
-     * @param start
-     * @param endCitys
-     * @param max_distance the maximum distance you want to search in the road network
-     * @return A list of Citys within the maximum distance sorted in ascending order by distance to start (index 0 means closest)
-     */
+    
     public static List<City> getCitiesWithinDistance(City start, Map endCities, double max_distance, RefugeeFamily refugee)
     {
         //        int[] cacheKey = new int[] {start.location.xLoc, start.location.yLoc, goal.location.xLoc, goal.location.yLoc};
@@ -256,7 +143,7 @@ public class AStar {
             System.out.println("Error: invalid City provided to AStar");
         }
 
-        // containers for the metainformation about the Citys relative to the
+        // containers for the metainformation about the Cities relative to the
         // A* search
         HashMap<City, AStarCityWrapper> foundCities =
                 new HashMap<City, AStarCityWrapper>();
@@ -271,7 +158,7 @@ public class AStar {
         startCity.hx = 0;
         startCity.fx = 0;
 
-        // A* containers: allRoadCitys to be investigated, allRoadCitys that have been investigated
+        // A* containers: allRoadCities to be investigated, allRoadCities that have been investigated
         //was ArrayList
         HashSet<AStarCityWrapper> closedSet = new HashSet<>(),
                 openSet = new HashSet<>();
@@ -282,9 +169,9 @@ public class AStar {
         openSetQueue.add(startCity);
 
         List<City> CitiesToReturn = new LinkedList<>();
-        ListIterator<City> listIterator = CitiesToReturn.listIterator();//pointer to last position in the CitysToReturn
+        ListIterator<City> listIterator = CitiesToReturn.listIterator();//pointer to last position in the CitiesToReturn
 
-        while(openSet.size() > 0){ // while there are reachable allRoadCitys to investigate
+        while(openSet.size() > 0){ // while there are reachable allRoadCities to investigate
 
             //AStarCityWrapper x = findMin(openSet); // find the shortest path so far
             AStarCityWrapper x = openSetQueue.peek();
@@ -350,12 +237,12 @@ public class AStar {
 //            if(foundCities.size()%10000 == 0)
 //                System.out.println("Time = " + System.currentTimeMillis());
         }
-        //System.out.println("Searched " + foundCities.size() + " Citys but could not find it");
+        //System.out.println("Searched " + foundCities.size() + " Cities but could not find it");
         return CitiesToReturn;
     }
 
     /**
-     * Uses Djikstra to find the closest in the list of endCitys.  Returns the endCity that is closest.
+     * Uses Djikstra to find the closest in the list of endCities.  Returns the endCity that is closest.
      * @param start
      * @param distance the target distance to stop
      * @return
@@ -372,7 +259,7 @@ public class AStar {
             System.out.println("Error: invalid City provided to AStar");
         }
 
-        // containers for the metainformation about the Citys relative to the
+        // containers for the metainformation about the Cities relative to the
         // A* search
         HashMap<City, AStarCityWrapper> foundCities =
                 new HashMap<City, AStarCityWrapper>();
@@ -387,7 +274,7 @@ public class AStar {
         startCity.hx = 0;
         startCity.fx = 0;
 
-        // A* containers: allRoadCitys to be investigated, allRoadCitys that have been investigated
+        // A* containers: allRoadCities to be investigated, allRoadCities that have been investigated
         HashSet<AStarCityWrapper> closedSet = new HashSet<>(),
                 openSet = new HashSet<>();
         PriorityQueue<AStarCityWrapper> openSetQueue = new PriorityQueue<>(10000);
@@ -395,7 +282,7 @@ public class AStar {
         openSet.add(startCity);
         openSetQueue.add(startCity);
 
-        while(openSet.size() > 0){ // while there are reachable allRoadCitys to investigate
+        while(openSet.size() > 0){ // while there are reachable allRoadCities to investigate
 
             //AStarCityWrapper x = findMin(openSet); // find the shortest path so far
             AStarCityWrapper x = openSetQueue.peek();
@@ -458,7 +345,7 @@ public class AStar {
 //            if(foundCities.size()%10000 == 0)
 //                System.out.println("Time = " + System.currentTimeMillis());
         }
-        //System.out.println("Searched " + foundCities.size() + " Citys but could not find it");
+        //System.out.println("Searched " + foundCities.size() + " Cities but could not find it");
         return null;
     }
 
@@ -470,6 +357,9 @@ public class AStar {
      */
     static Route reconstructRoute(AStarCityWrapper n, AStarCityWrapper start, AStarCityWrapper end, RefugeeFamily refugee)
     {
+
+
+    			
         List<Int2D> result = new ArrayList<>(20);
 
 
@@ -493,17 +383,26 @@ public class AStar {
             //convert speed to cell block per step
             mod_speed = Parameters.convertFromKilometers(mod_speed);
            // System.out.println("" + mod_speed);
-            
+            AStarCityWrapper to = x;
             x = x.cameFrom;
             
             while (x != null)
             {
-
+            	
                 double dist = x.city.location.distance(result.get(0));
+                
 
+            	//ArrayList<Object> attributes = new ArrayList<Object>();
+            	 edge = (RoadInfo) roadNetwork.getEdge(x.city, to.city).getInfo();
+            	//attributes.add(edge.getSpeed());
+
+
+            			
                 while(dist > mod_speed)
-                {
-                	
+                {	
+                	//HashMap<Int2D, List<Object>> locAttributes = new HashMap<Int2D, List<Object>>();
+                	//Int2D point = getPointAlongLine(result.get(0), x.city.location, mod_speed/dist);
+                	//locAttributes.put( point, attributes);
                     result.add(0, getPointAlongLine(result.get(0), x.city.location, mod_speed/dist));
                     dist = x.city.location.distance(result.get(0));
                 }
@@ -519,11 +418,8 @@ public class AStar {
                 if (x.cameFrom == null){
                 	refugee.setCurrent(x.city);
                 }
-
+                to = x;
                 x = x.cameFrom;
-
-
-
                 if(x != null && x.cameFrom != null)
                     totalDistance += x.city.location.distance(x.cameFrom.city.location);
             }
@@ -546,17 +442,17 @@ public class AStar {
     }
 
     /**
-     * Measure of the estimated distance between two Citys.
-     * @return notional "distance" between the given allRoadCitys.
+     * Measure of the estimated distance between two Cities.
+     * @return notional "distance" between the given allRoadCities.
      */
     static double heuristic(City x, City y) {
-        return x.location.distance(y.location);
+        return x.location.distance(y.location);// * Parameters.HEU_WEIGHT;
     }
 
     /**
-     *  Considers the list of Citys open for consideration and returns the City 
+     *  Considers the list of Cities open for consideration and returns the City 
      *  with minimum fx value
-     * @param set list of open Citys
+     * @param set list of open Cities
      * @return
      */
     static AStarCityWrapper findMin(Collection<AStarCityWrapper> set) {
@@ -572,7 +468,7 @@ public class AStar {
     }
 
     /**
-     * A wrapper to contain the A* meta information about the Citys
+     * A wrapper to contain the A* meta information about the Cities
      *
      */
     static class AStarCityWrapper implements Comparable<AStarCityWrapper>{
