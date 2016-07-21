@@ -1,4 +1,5 @@
 package refugee;
+
 import sim.util.Int2D;
 
 import java.lang.reflect.Array;
@@ -6,88 +7,78 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class is a wrapper class for an ArrayList that manages a path and other information
+ * This class is a wrapper class for an ArrayList that manages a path and other
+ * information
  */
-public class Route
-{
-    private List<Int2D> path;//list of places this person needs to go
-    private double distance;
-    private City start;
-    private City end;
-    private double speed;
+public class Route {
+	private List<Int2D> path;// list of places this person needs to go
+	private double distance;
+	private City start;
+	private City end;
+	private double speed;
 
-    public Route(List<Int2D> path, double distance, City start, City end, double speed)
-    {
-        this.path = path;
-        this.distance = distance;
-        this.start = start;
-        this.end = end;
-        this.speed = speed;
-    }
+	public Route(List<Int2D> path, double distance, City start, City end, double speed) {
+		this.path = path;
+		this.distance = distance;
+		this.start = start;
+		this.end = end;
+		this.speed = speed;
+	}
 
-    /**
-     * @return next location to move, null if no more moves
-     */
-    public Int2D getLocation(int index)
-    {
-        Int2D location = path.get(index);
-        return location;
-    }
-    
-    public int getIndex(Int2D location){
-    	return path.indexOf(location);
-    }
+	/**
+	 * @return next location to move, null if no more moves
+	 */
+	public Int2D getLocation(int index) {
+		Int2D location = path.get(index);
+		return location;
+	}
 
-    public double getTotalDistance()
-    {
-        return distance;
-    }
+	public int getIndex(Int2D location) {
+		return path.indexOf(location);
+	}
 
-    public int getNumSteps()
-    {
-        return path.size();
-    }
+	public double getTotalDistance() {
+		return distance;
+	}
 
-    public City getStart()
-    {
-        return start;
-    }
+	public int getNumSteps() {
+		return path.size();
+	}
 
-    public City getEnd()
-    {
-        return end;
-    }
+	public City getStart() {
+		return start;
+	}
 
-    public Route reverse()
-    {
-        List<Int2D> reversedPath = new ArrayList<Int2D>(path.size());
-        for(int i = path.size()-1; i >= 0; i--)
-            reversedPath.add(path.get(i));
-        return new Route(reversedPath, this.distance, this.end, this.start, speed);
-    }
+	public City getEnd() {
+		return end;
+	}
 
-    public void addToEnd(Int2D location)
-    {
-        //convert speed to correct units
-        double speed = this.speed;
+	public Route reverse() {
+		List<Int2D> reversedPath = new ArrayList<Int2D>(path.size());
+		for (int i = path.size() - 1; i >= 0; i--)
+			reversedPath.add(path.get(i));
+		return new Route(reversedPath, this.distance, this.end, this.start, speed);
+	}
 
-        speed *= Parameters.TEMPORAL_RESOLUTION;//now km per step
+	public void addToEnd(Int2D location) {
+		// convert speed to correct units
+		double speed = this.speed;
 
-        //convert speed to cell block per step
-        speed = Parameters.convertFromKilometers(speed);
+		speed *= Parameters.TEMPORAL_RESOLUTION;// now km per step
 
-        double dist = location.distance(path.get(path.size()-1));
-        while(speed < dist)
-        {
-            path.add(AStar.getPointAlongLine(path.get(path.size()-1), location, speed/dist));
-            dist = path.get(path.size()-1).distance(location);
-        }
+		// convert speed to cell block per step
+		speed = Parameters.convertFromKilometers(speed);
 
-        path.add(location);
-    }
+		double dist = location.distance(path.get(path.size() - 1));
+		while (speed < dist) {
+			path.add(AStar.getPointAlongLine(path.get(path.size() - 1), location, speed / dist));
+			dist = path.get(path.size() - 1).distance(location);
+		}
 
+		path.add(location);
+	}
 
-    public double getSpeed() {
-        return speed;
-    }
+	public double getSpeed() {
+		return speed;
+	}
 }
