@@ -40,7 +40,7 @@ public class AStar {
 		foundCities.put(goal, goalCity);
 
 		startCity.gx = 0;
-		startCity.hx = heuristic(start, goal);
+		startCity.hx = heuristic(start, goal); 
 		startCity.fx = heuristic(start, goal);
 
 		// A* containers: allRoadCities to be investigated, allRoadCities that
@@ -116,8 +116,8 @@ public class AStar {
 					nextCity.cameFrom = x;
 					nextCity.gx = tentativeCost;
 					nextCity.fx = nextCity.gx + nextCity.hx;
-					// System.out.println("fx: " + nextCity.fx + "gx: " +
-					// nextCity.gx);
+					 //System.out.println("fx: " + nextCity.fx + "gx: " +
+					 //nextCity.gx);
 				}
 			}
 

@@ -148,9 +148,14 @@ class City {
 		Route route;
 
 		route = AStar.astarPath(this, destination, refugeeFamily);
-		System.out.println(route.getNumSteps());
+		//System.out.println(route.getNumSteps());
 
 		return route;
 	}
+	
+	public double getScale(){
+		return refugees.size() / (Parameters.NUM_ORIG_PLACES *Parameters.NUM_ORIG_REFUGEES);
+	}
+	
 
 }

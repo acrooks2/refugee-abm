@@ -48,7 +48,7 @@ class MigrationBuilder {
 
 		age_dist = new HashMap<Integer, ArrayList<Double>>();
 		String[] cityAttributes = { "ID", "NAME_1", "ORIG", "POP", "SPOP_1", "QUOTA_1", "VIOL_1", "ECON_1", "FAMILY_1" };
-		String[] roadAttributes = { "ID", "FR", "TO", "SPEED_1", "POP", "COST_1", "TLEVEL_1", "DEATH", "LENGTH_1" };
+		String[] roadAttributes = { "ID", "FR", "TO", "SPEED_1", "POP", "COST_1", "TLEVEL_1", "DEATH_1", "LENGTH_1" };
 		String[] regionAttributes = { "REGION", "SQKM" };
 
 		migrationSim.world_height = 500; // TODO - set correct size
@@ -317,7 +317,7 @@ class MigrationBuilder {
 			double distance = gm.getDoubleAttribute("LENGTH_1");
 			double cost = gm.getDoubleAttribute("COST_1");
 			double transportlevel = gm.getDoubleAttribute("TLEVEL_1");
-			double deaths = gm.getDoubleAttribute("DEATH");
+			double deaths = gm.getDoubleAttribute("DEATH_1");
 
 			RoadInfo edgeinfo = new RoadInfo(gm.geometry, from, to, speed, distance, cost, transportlevel, deaths);
 

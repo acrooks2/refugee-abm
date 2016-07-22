@@ -82,7 +82,7 @@ public class MigrationWithUI extends GUIState {
 
 		// Adding the city portrayal
 		cityPortrayal.setField(((Migration) state).cityGrid);
-		cityPortrayal.setPortrayalForAll(new OvalPortrayal2D(new Color(255, 154, 146), 7.0, true));
+		cityPortrayal.setPortrayalForAll(new OvalPortrayal2D(new Color(255, 154, 146), 5.0, true));
 
 		// Adding the road portrayal
 		roadLinkPortrayal.setField(((Migration) state).roadLinks);
@@ -95,6 +95,21 @@ public class MigrationWithUI extends GUIState {
 
 	// display refresh each step
 	public void setupMovingPortrayals() {
+		
+		cityPortrayal.setField(((Migration) state).cityGrid);
+		cityPortrayal.setPortrayalForAll(new OvalPortrayal2D(){
+			@Override
+			public void draw(Object object, Graphics2D graphics, DrawInfo2D info) {
+			City city = (City) object;
+			paint = new Color(255, 154, 146);
+			System.out.println(city.getName() + " Population: "  + city.getRefugeePopulation());
+			super.scale = 5;//city.getScale() * 200;
+			super.filled = true;
+			super.draw(object, graphics, info);
+			}
+		});
+		
+		
 		refugeePortrayal.setField(((Migration) this.state).world);
 		refugeePortrayal.setPortrayalForAll(new OvalPortrayal2D() {
 			@Override
@@ -103,7 +118,7 @@ public class MigrationWithUI extends GUIState {
 				RefugeeFamily refugee = (RefugeeFamily) object;
 				// System.out.println(refugee);
 				paint = new Color(255, 20, 215);
-				super.draw(object, graphics, info);
+				//super.draw(object, graphics, info);
 				super.filled = true;
 				super.scale = 3;
 				super.draw(object, graphics, info);

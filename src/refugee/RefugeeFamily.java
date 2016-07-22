@@ -49,19 +49,29 @@ class RefugeeFamily implements Steppable {
 		} else {
 			Bag cities = migrationSim.cities; // change later when cities
 												// included in map
-
+			if (this.location != this.goal.getLocation()){
 			City goalCity = calcGoalCity(cities);
-			if (this.goal.getName() != goalCity.getName())
-				System.out.println("Goal Changed");
+			//if (this.goal.getName().compareTo(goalCity.getName()) != 0)
+				//System.out.println("Goal Changed");
+			//if (goalCity.getName().compareTo("London") != 0 || goalCity.getName().compareTo("Munich") != 0)
+				//System.out.println("Different");
+						
 			this.goal = goalCity;
 			for (Object c : cities) {
 				City city = (City) c;
 				if (this.location == city.getLocation()) {
 					currentCity = city;
+					for (Refugee r: this.familyMembers)
+						city.addMember(r);
 				}
+				else{
+					for (Refugee r: this.familyMembers)
+						city.getRefugees().remove(r);
+				}
+				
 			}
-			System.out.println("Home: " + this.getHome().getName() + " Goal " + goalCity.getName());
-			 System.out.println("Current: "+ currentCity.getName());
+			//System.out.println("Home: " + this.getHome().getName() + " Goal " + goalCity.getName());
+			// System.out.println("Current: "+ currentCity.getName());
 			 //System.out.println(route);
 			if (this.location != goalCity.getLocation()) {
 				setGoal(currentCity, goalCity);// Astar inside here
@@ -80,6 +90,7 @@ class RefugeeFamily implements Steppable {
 					updatePositionOnMap(migrationSim);
 				}
 			}
+		}
 		}
 	}
 
@@ -115,7 +126,7 @@ class RefugeeFamily implements Steppable {
 	public void updatePositionOnMap(Migration migrationSim) {
 		double randX = migrationSim.random.nextDouble();
 		double randY = migrationSim.random.nextDouble();
-		System.out.println("Location: " + location.getX() + " " + location.getY());
+		//System.out.println("Location: " + location.getX() + " " + location.getY());
 		migrationSim.world.setObjectLocation(this, new Double2D(location.getX() + randX, location.getY() + randY));
 		// migrationSim.worldPopResolution.setObjectLocation(this,
 		// (int)location.getX()/10, (int)location.getY()/10);
