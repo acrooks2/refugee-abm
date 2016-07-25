@@ -357,7 +357,7 @@ public class AStar {
 			RefugeeFamily refugee) {
 		
 		List<Int2D> locations = new ArrayList<Int2D>(100);
-		//List<RoadInfo> edges = new ArrayList<RoadInfo>(100);
+		List<RoadInfo> edges = new ArrayList<RoadInfo>(100);
 	
 		// double mod_speed = speed;
 		double totalDistance = 0;
@@ -366,10 +366,12 @@ public class AStar {
 		// start by adding the last one
 		
 		locations.add(0, x.city.location);
-		//RoadInfo edge = null;
+		RoadInfo edge = null;
 
 		if (x.cameFrom != null) {
-			RoadInfo edge = (RoadInfo) roadNetwork.getEdge(x.cameFrom.city, x.city).getInfo();
+			edge = (RoadInfo) roadNetwork.getEdge(x.cameFrom.city, x.city).getInfo();
+			edges.add(0, edge);
+			//RoadInfo edge = (RoadInfo) roadNetwork.getEdge(x.cameFrom.city, x.city).getInfo();
 			double mod_speed = edge.getSpeed() * Parameters.TEMPORAL_RESOLUTION;// now
 																				// km
 																				// per
@@ -383,12 +385,12 @@ public class AStar {
 			while (x != null) {
 
 				double dist = x.city.location.distance(locations.get(0));
-				//edge = (RoadInfo) roadNetwork.getEdge(x.city, to.city).getInfo();
+				edge = (RoadInfo) roadNetwork.getEdge(x.city, to.city).getInfo();
 				
 				while (dist > mod_speed) {
 					locations.add(0, getPointAlongLine(locations.get(0), x.city.location, mod_speed / dist));
 					//System.out.println(x.city.getName());
-					//edges.add(0, edge);
+					edges.add(0, edge);
 					dist = x.city.location.distance(locations.get(0));
 				}
 				if (x.cameFrom != null) {
@@ -411,13 +413,13 @@ public class AStar {
 			}
 		}
 		else{
-		//edges.add(0, edge);	
+		edges.add(0, edge);	
 		
 		}
 		locations.add(0, start.city.location);
-		//edges.add(0, edge);
-		//return new Route(locations, edges, totalDistance, start.city, end.city, Parameters.WALKING_SPEED);
-		return new Route(locations, totalDistance, start.city, end.city, Parameters.WALKING_SPEED);
+		edges.add(0, edge);
+		return new Route(locations, edges, totalDistance, start.city, end.city, Parameters.WALKING_SPEED);
+		//return new Route(locations, totalDistance, start.city, end.city, Parameters.WALKING_SPEED);
 	}
 	
 	static void determineDeath(RoadInfo edge, RefugeeFamily refugee){

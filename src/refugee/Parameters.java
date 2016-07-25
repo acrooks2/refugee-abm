@@ -11,7 +11,7 @@ class Parameters {
 	public static double DANGER_CARE_WEIGHT = 0.2;
 	public static double FAMILY_ABROAD_CARE_WEIGHT = 0.2;
 	// -------Edge Weights-------//
-	public static double ROAD_DEATH_WEIGHT = 0.01;
+	public static double ROAD_DEATH_WEIGHT = 0.1;
 	public static double MAX_EDGE_LENGTH = 1337284.917613;
 	public static double MIN_EDGE_LENGTH = 81947.33824;
 	public static double COST_WEIGHT = 2.0;

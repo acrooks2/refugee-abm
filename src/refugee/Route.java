@@ -66,6 +66,10 @@ public class Route {
 	public int getNumSteps() {
 		return locations.size();
 	}
+	
+	public int getNumEdges(){
+		return edges.size();
+	}
 
 	public City getStart() {
 		return start;

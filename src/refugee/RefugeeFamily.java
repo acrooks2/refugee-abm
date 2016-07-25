@@ -27,7 +27,7 @@ class RefugeeFamily implements Steppable {
 	public RefugeeFamily(Int2D location, int size, City home, double finStatus) {
 		this.location = location;
 		this.home = home;
-		this.goal = home;
+		this.goal = null;
 		this.finStatus = finStatus;
 		familyMembers = new ArrayList<Refugee>();
 		currentCity = home;
@@ -96,9 +96,9 @@ class RefugeeFamily implements Steppable {
 					this.setLocation(nextStep);
 					updatePositionOnMap(migrationSim);
 				}
-				System.out.println(route.getNumSteps());
-				//RoadInfo edge = route.getEdge(newIndex);
-				///=determineDeath(edge, this);
+				System.out.println(route.getNumSteps() + ", " + route.getNumEdges());
+				RoadInfo edge = route.getEdge(newIndex);
+				determineDeath(edge, this);
 			}
 		}
 	//	}

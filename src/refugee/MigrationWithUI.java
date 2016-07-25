@@ -141,8 +141,11 @@ public class MigrationWithUI extends GUIState {
 			public void draw(Object object, Graphics2D graphics, DrawInfo2D info) {
 
 				Refugee refugee = (Refugee) object;
+				if (refugee.getHealthStatus() == Constants.DEAD)
+					paint = new Color(255, 0, 0);
 				// System.out.println(refugee);
-				paint = new Color(255, 20, 215);
+				else
+					paint = new Color(0, 100, 100);
 				//super.draw(object, graphics, info);
 				super.filled = true;
 				super.scale = 3;
