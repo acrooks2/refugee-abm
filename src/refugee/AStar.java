@@ -7,6 +7,8 @@ import sim.field.network.Network;
 import sim.util.Bag;
 import sim.util.Heap;
 import sim.util.Int2D;
+import ec.util.MersenneTwisterFast;
+//import org.apache.commons.collections4.sequence.SequencedHashMap;
 
 @SuppressWarnings("restriction")
 public class AStar {
@@ -20,6 +22,7 @@ public class AStar {
 	 * @return
 	 */
 	public static Network roadNetwork = MigrationBuilder.migrationSim.roadNetwork;
+	public static MersenneTwisterFast random = new MersenneTwisterFast();
 
 	static public Route astarPath(City start, City goal, RefugeeFamily refugee) {
 
@@ -59,6 +62,8 @@ public class AStar {
 			if (x.city == goal) { // we have found the shortest possible path to
 									// the goal!
 				// Reconstruct the path and send it back.
+				if (x.cameFrom == null)
+					System.out.println(x.city.getName());
 				return reconstructRoute(goalCity, startCity, goalCity, refugee);
 			}
 			openSet.remove(x); // maintain the lists
@@ -70,7 +75,7 @@ public class AStar {
 			for (Object l : edges) {
 				Edge e = (Edge) l;
 				City n = (City) e.from();
-				if (n == x.city)
+ 				if (n == x.city)
 					n = (City) e.to();
 
 				// get the A* meta information about this City
@@ -350,15 +355,18 @@ public class AStar {
 	 */
 	static Route reconstructRoute(AStarCityWrapper n, AStarCityWrapper start, AStarCityWrapper end,
 			RefugeeFamily refugee) {
-
-		List<Int2D> result = new ArrayList<>(20);
-
+		
+		List<Int2D> locations = new ArrayList<Int2D>(100);
+		//List<RoadInfo> edges = new ArrayList<RoadInfo>(100);
+	
 		// double mod_speed = speed;
 		double totalDistance = 0;
 		AStarCityWrapper x = n;
 
 		// start by adding the last one
-		result.add(0, x.city.location);
+		
+		locations.add(0, x.city.location);
+		//RoadInfo edge = null;
 
 		if (x.cameFrom != null) {
 			RoadInfo edge = (RoadInfo) roadNetwork.getEdge(x.cameFrom.city, x.city).getInfo();
@@ -374,12 +382,14 @@ public class AStar {
 
 			while (x != null) {
 
-				double dist = x.city.location.distance(result.get(0));
-				edge = (RoadInfo) roadNetwork.getEdge(x.city, to.city).getInfo();
+				double dist = x.city.location.distance(locations.get(0));
+				//edge = (RoadInfo) roadNetwork.getEdge(x.city, to.city).getInfo();
+				
 				while (dist > mod_speed) {
-					result.add(0, getPointAlongLine(result.get(0), x.city.location, mod_speed / dist));
+					locations.add(0, getPointAlongLine(locations.get(0), x.city.location, mod_speed / dist));
 					//System.out.println(x.city.getName());
-					dist = x.city.location.distance(result.get(0));
+					//edges.add(0, edge);
+					dist = x.city.location.distance(locations.get(0));
 				}
 				if (x.cameFrom != null) {
 					edge = (RoadInfo) roadNetwork.getEdge(x.cameFrom.city, x.city).getInfo();
@@ -400,9 +410,23 @@ public class AStar {
 					totalDistance += x.city.location.distance(x.cameFrom.city.location);
 			}
 		}
-
-		result.add(0, start.city.location);
-		return new Route(result, totalDistance, start.city, end.city, Parameters.WALKING_SPEED);
+		else{
+		//edges.add(0, edge);	
+		
+		}
+		locations.add(0, start.city.location);
+		//edges.add(0, edge);
+		//return new Route(locations, edges, totalDistance, start.city, end.city, Parameters.WALKING_SPEED);
+		return new Route(locations, totalDistance, start.city, end.city, Parameters.WALKING_SPEED);
+	}
+	
+	static void determineDeath(RoadInfo edge, RefugeeFamily refugee){
+		double deaths = edge.getDeaths() * Parameters.ROAD_DEATH_WEIGHT;
+		double r= random.nextDouble();
+		if (r < deaths){//first family member dies (for now)
+			refugee.getFamily().get(0).setHealthStatus(0);
+		}
+		
 	}
 
 	/**

@@ -46,7 +46,7 @@ class Migration extends SimState {
 	public int total_scaled_pop = 0; // number of agents in the model (scaled
 										// from total_pop)
 	public long total_pop = 0; // actual population (not scaled)
-
+	public int total_dead = 0;
 	/*
 	 * charts can include: number dead, specifics for each country, etc.
 	 */
@@ -57,7 +57,9 @@ class Migration extends SimState {
 
 	// public Map<Integer, List<MovementPattern>> movementPatternMap = new
 	// HashMap<>();
-
+	
+    public XYSeries totalDeadSeries = new XYSeries(" Dead"); // shows number of recovered agents
+    
 	public Migration(long seed) {
 		super(seed);
 	}
@@ -78,11 +80,17 @@ class Migration extends SimState {
 			@Override
 			public void step(SimState simState) {
 				long cStep = simState.schedule.getSteps();
-				/*
-				 * charts deaths over time average distance traveled number
-				 * reaching goal (without running out of money or dying* money
-				 * over time after closing off, change of course
-				 */
+				   Bag allRefugees = world.getAllObjects();
+				   for (Object o: allRefugees){
+					   //RefugeeFamily family = (RefugeeFamily) o;
+					   Refugee r = (Refugee)o;
+					  // for (Refugee r: family.getFamily()){
+						   if (r.getHealthStatus() == Constants.DEAD)
+							   total_dead++;
+					   //}
+				   }
+				   totalDeadSeries.add(cStep*Parameters.TEMPORAL_RESOLUTION, total_dead);
+
 			}
 		};
 		this.schedule.scheduleRepeating(chartUpdater);

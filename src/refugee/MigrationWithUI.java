@@ -66,6 +66,29 @@ public class MigrationWithUI extends GUIState {
 		c.registerFrame(displayFrame);
 		displayFrame.setVisible(true);
 		displayFrame.setSize(1280, 1024);
+		
+		//deaths chart
+	       Dimension dm = new Dimension(300,300);
+	        Dimension dmn = new Dimension(300,300);
+		TimeSeriesChartGenerator healthStatus;
+        healthStatus = new TimeSeriesChartGenerator();
+        healthStatus.createFrame();
+        healthStatus.setSize(dm);
+        healthStatus.setTitle("Health Status");
+        healthStatus.setRangeAxisLabel("Number of People");
+        healthStatus.setDomainAxisLabel("Hours");
+        healthStatus.setMaximumSize(dm);
+        healthStatus.setMinimumSize(dmn);
+//        chartSeriesCholera.setMinimumChartDrawSize(400, 300); // makes it scale at small sizes
+//        chartSeriesCholera.setPreferredChartSize(400, 300); // lets it be small
+
+        healthStatus.addSeries(((Migration) this.state).totalDeadSeries, null);
+        
+        JFrame frameSeries = healthStatus.createFrame(this);
+        frameSeries.pack();
+        c.registerFrame(frameSeries);
+        frameSeries.setVisible(true);
+
 
 		// ((Console) c).pressPlay();
 	}
@@ -102,8 +125,10 @@ public class MigrationWithUI extends GUIState {
 			public void draw(Object object, Graphics2D graphics, DrawInfo2D info) {
 			City city = (City) object;
 			paint = new Color(255, 154, 146);
-			System.out.println(city.getName() + " Population: "  + city.getRefugeePopulation());
-			super.scale = 5;//city.getScale() * 200;
+			//System.out.println(city.getName() + " Population: "  + city.getRefugeePopulation());
+			double scale = city.getScale()*200;
+			System.out.println(scale);
+			super.scale = scale;
 			super.filled = true;
 			super.draw(object, graphics, info);
 			}
@@ -115,7 +140,7 @@ public class MigrationWithUI extends GUIState {
 			@Override
 			public void draw(Object object, Graphics2D graphics, DrawInfo2D info) {
 
-				RefugeeFamily refugee = (RefugeeFamily) object;
+				Refugee refugee = (Refugee) object;
 				// System.out.println(refugee);
 				paint = new Color(255, 20, 215);
 				//super.draw(object, graphics, info);

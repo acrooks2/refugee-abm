@@ -2,8 +2,8 @@ package refugee;
 
 class Parameters {
 	public static double TEMPORAL_RESOLUTION = 0.4;// steps per hour
-	public static int NUM_ORIG_REFUGEES = 50;
-	public static int NUM_ORIG_PLACES = 50;
+	public static int NUM_ORIG_REFUGEES = 10;
+	public static int NUM_ORIG_PLACES = 10;
 	// ----Refugee Characteristic Weights----//
 	public static double AVG_FAMILY_SIZE = 6.3; // http://www.acted.org/en/food-security-situation-and-livelihood-intervention-opportunities-syrians-refugees-and-host-communit
 	public static double FAMILY_SIZE_SD = 2.92; // same as above
@@ -11,6 +11,7 @@ class Parameters {
 	public static double DANGER_CARE_WEIGHT = 0.2;
 	public static double FAMILY_ABROAD_CARE_WEIGHT = 0.2;
 	// -------Edge Weights-------//
+	public static double ROAD_DEATH_WEIGHT = 0.01;
 	public static double MAX_EDGE_LENGTH = 1337284.917613;
 	public static double MIN_EDGE_LENGTH = 81947.33824;
 	public static double COST_WEIGHT = 2.0;

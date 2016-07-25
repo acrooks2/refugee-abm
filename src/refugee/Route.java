@@ -6,19 +6,32 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
+
+
 /**
- * This class is a wrapper class for an ArrayList that manages a path and other
+ * This class is a wrapper class for an ArrayList that manages a locations and other
  * information
  */
 public class Route {
-	private List<Int2D> path;// list of places this person needs to go
+	private List<Int2D> locations;// list of places this person needs to go
+	private List<RoadInfo> edges;
 	private double distance;
 	private City start;
 	private City end;
 	private double speed;
 
-	public Route(List<Int2D> path, double distance, City start, City end, double speed) {
-		this.path = path;
+	public Route(List<Int2D> locations, List<RoadInfo> edges, double distance, City start, City end, double speed) {
+		this.locations = locations;
+		this.edges = edges;
+		this.distance = distance;
+		this.start = start;
+		this.end = end;
+		this.speed = speed;
+	}
+	
+	public Route(List<Int2D> locations, double distance, City start, City end, double speed) {
+		this.locations = locations;
+		//this.edges = edges;
 		this.distance = distance;
 		this.start = start;
 		this.end = end;
@@ -29,12 +42,21 @@ public class Route {
 	 * @return next location to move, null if no more moves
 	 */
 	public Int2D getLocation(int index) {
-		Int2D location = path.get(index);
+		Int2D location = locations.get(index);
 		return location;
 	}
+	
+	public RoadInfo getEdge(int index) {
+		RoadInfo edge = edges.get(index);
+		return edge;
+	}
 
-	public int getIndex(Int2D location) {
-		return path.indexOf(location);
+	public int getLocIndex(Int2D loc) {
+		return locations.indexOf(loc);
+	}
+	
+	public int getEdgeIndex(RoadInfo edge) {
+		return edges.indexOf(edge);
 	}
 
 	public double getTotalDistance() {
@@ -42,7 +64,7 @@ public class Route {
 	}
 
 	public int getNumSteps() {
-		return path.size();
+		return locations.size();
 	}
 
 	public City getStart() {
@@ -54,13 +76,17 @@ public class Route {
 	}
 
 	public Route reverse() {
-		List<Int2D> reversedPath = new ArrayList<Int2D>(path.size());
-		for (int i = path.size() - 1; i >= 0; i--)
-			reversedPath.add(path.get(i));
-		return new Route(reversedPath, this.distance, this.end, this.start, speed);
+		List<Int2D> reversedlocations = new ArrayList<Int2D>(locations.size());
+		//List<RoadInfo> reversedEdges = new ArrayList<RoadInfo>(edges.size());
+		for (int i = locations.size() - 1; i >= 0; i--){
+			reversedlocations.add(locations.get(i));
+			//reversedEdges.add(edges.get(i));
+		}
+		//return new Route(reversedlocations, reversedEdges, this.distance, this.end, this.start, speed);
+		return new Route(reversedlocations,  this.distance, this.end, this.start, speed);
 	}
 
-	public void addToEnd(Int2D location) {
+	/*public void addToEnd(Int2D location) {
 		// convert speed to correct units
 		double speed = this.speed;
 
@@ -69,14 +95,14 @@ public class Route {
 		// convert speed to cell block per step
 		speed = Parameters.convertFromKilometers(speed);
 
-		double dist = location.distance(path.get(path.size() - 1));
+		double dist = location.distance(locations.get(locations.size() - 1).getLoc());
 		while (speed < dist) {
-			path.add(AStar.getPointAlongLine(path.get(path.size() - 1), location, speed / dist));
-			dist = path.get(path.size() - 1).distance(location);
+			locations.add(AStar.getPointAlongLine(locations.get(locations.size() - 1), location, speed / dist));
+			dist = locations.get(locations.size() - 1).distance(location);
 		}
 
-		path.add(location);
-	}
+		locations.add(location);
+	}*/
 
 	public double getSpeed() {
 		return speed;

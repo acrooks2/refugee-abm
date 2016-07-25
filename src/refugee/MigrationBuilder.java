@@ -190,7 +190,7 @@ class MigrationBuilder {
 								+ (int) (migrationSim.random.nextDouble() * Parameters.WORLD_TO_POP_SCALE);
 						double x_coord = (loc.x * Parameters.WORLD_TO_POP_SCALE)
 								+ (int) (migrationSim.random.nextDouble() * Parameters.WORLD_TO_POP_SCALE);
-						migrationSim.world.setObjectLocation(r, new Double2D(x_coord, y_coord));
+						migrationSim.world.setObjectLocation(refugee, new Double2D(x_coord, y_coord));
 						int y_coordint = loc.y + (int) ((migrationSim.random.nextDouble() - 0.5) * 3);
 						int x_coordint = loc.x + (int) ((migrationSim.random.nextDouble() - 0.5) * 3);
 						migrationSim.total_pop++;

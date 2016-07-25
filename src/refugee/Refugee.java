@@ -17,7 +17,7 @@ class Refugee {
 	private int sex; // 0 male, 1 female
 	private RefugeeFamily family;
 	private Int2D location;
-	private int healthStatus = 0; // default 0 (alive), rank 0-2
+	private int healthStatus = 1; // default 1 (alive), dead 0
 
 	public Refugee(int sex, int age, RefugeeFamily family) {
 		this.sex = sex;
