@@ -48,7 +48,7 @@ class MigrationBuilder {
 
 		age_dist = new HashMap<Integer, ArrayList<Double>>();
 		String[] cityAttributes = { "ID", "NAME_1", "ORIG", "POP", "SPOP_1", "QUOTA_1", "VIOL_1", "ECON_1", "FAMILY_1" };
-		String[] roadAttributes = { "ID", "FR", "TO", "SPEED_1", "POP", "COST_1", "TLEVEL_1", "DEATH_1", "LENGTH_1" };
+		String[] roadAttributes = { "ID", "FR", "TO", "SPEED_1", "POP", "COST", "TLEVEL_1", "DEATH_1", "LENGTH_1" };
 		String[] regionAttributes = { "REGION", "SQKM" };
 
 		migrationSim.world_height = 500; // TODO - set correct size
@@ -181,7 +181,8 @@ class MigrationBuilder {
 																		// points
 					RefugeeFamily r = createRefugeeFamily(city);
 					System.out.println(r.getFamily().size());
-					for (Refugee refugee : r.getFamily()) {
+					for (Object o: r.getFamily()){
+						Refugee refugee = (Refugee)o;
 						currentPop++;
 						city.addMember(refugee);
 						migrationSim.refugees.add(refugee);
@@ -221,6 +222,7 @@ class MigrationBuilder {
 
 			// now get age
 			int age = pick_age(age_dist, city.getID());
+			System.out.println(age);
 
 			Refugee refugee = new Refugee(sex, age, refugeeFamily);
 			refugeeFamily.getFamily().add(refugee);
@@ -230,7 +232,7 @@ class MigrationBuilder {
 	}
 
 	private static int pick_age(HashMap<Integer, ArrayList<Double>> age_dist, int cityid) {
-		/*int category = 0;
+		int category = 0;
 		double rand = migrationSim.random.nextDouble();
 		ArrayList<Double> dist = age_dist.get(cityid);
 		for (int i = 1; i < 4; i++) {
@@ -252,8 +254,8 @@ class MigrationBuilder {
 			return migrationSim.random.nextInt(41) + 60; // 60+
 		default:
 			return 0;
-		}*/
-		return 5;
+		}
+		//return 5;
 
 	}
 
@@ -294,7 +296,7 @@ class MigrationBuilder {
 
 	private static double pick_fin_status() {
 		// TODO Auto-generated method stub
-		return 1.0;
+		return 3000;
 	}
 
 	private static int pickFamilySize() {
@@ -315,7 +317,7 @@ class MigrationBuilder {
 			int to = gm.getIntegerAttribute("TO");
 			double speed = gm.getDoubleAttribute("SPEED_1");
 			double distance = gm.getDoubleAttribute("LENGTH_1");
-			double cost = gm.getDoubleAttribute("COST_1");
+			double cost = gm.getDoubleAttribute("COST");
 			double transportlevel = gm.getDoubleAttribute("TLEVEL_1");
 			double deaths = gm.getDoubleAttribute("DEATH_1");
 

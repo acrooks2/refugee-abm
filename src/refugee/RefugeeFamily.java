@@ -8,17 +8,19 @@ import java.util.HashMap;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
+import sim.field.network.Edge;
 import sim.util.Bag;
 import sim.util.Double2D;
 import sim.util.Int2D;
 
 class RefugeeFamily implements Steppable {
 	private Int2D location;
-	private ArrayList<Refugee> familyMembers;
+	private Bag familyMembers;
 	private Route route;
 	private int routePosition;
 	private double finStatus;
 	private City home;
+	private Edge currentEdge;
 	private City currentCity;
 	private City goal;
 	static MersenneTwisterFast random = new MersenneTwisterFast();
@@ -29,7 +31,7 @@ class RefugeeFamily implements Steppable {
 		this.home = home;
 		this.goal = null;
 		this.finStatus = finStatus;
-		familyMembers = new ArrayList<Refugee>();
+		familyMembers = new Bag();
 		currentCity = home;
 		isMoving = true;
 		// routePosition = 0;
@@ -47,19 +49,25 @@ class RefugeeFamily implements Steppable {
 	//if (goalCity.getName().compareTo("London") != 0 || goalCity.getName().compareTo("Munich") != 0)
 		//System.out.println("Different");
 		
-		for (Object c : cities) {
+		/*for (Object c : cities) {
 			City city = (City) c;
 			if (this.location == city.getLocation()) { //if at a city, set current city to that city (keep until reach new city)
 				currentCity = city;
-				for (Refugee r: this.familyMembers)
+				RoadInfo edgeinfo = (RoadInfo) this.currentEdge.getInfo();
+				this.finStatus -= edgeinfo.getCost();//if at the end of an edge, subtract the money
+				for (Object o: this.familyMembers){
+					Refugee r = (Refugee)o;
 					city.addMember(r);
+				}
 			}
 			else{
-				for (Refugee r: this.familyMembers)
+				for (Object o: this.familyMembers){
+					Refugee r = (Refugee)o;
 					city.getRefugees().remove(r);
 			}
+			}
 			
-		}
+		}*/
 		
 		if (this.location == goalCity.location)
 			isMoving = false;
@@ -71,11 +79,12 @@ class RefugeeFamily implements Steppable {
 			return;
 		 else {
 			this.goal = goalCity;			
-			System.out.println("Home: " + this.getHome().getName() + " | Goal " + goalCity.getName());
-			 System.out.println("Current: "+ currentCity.getName());
+			//System.out.println("Home: " + this.getHome().getName() + " | Goal " + goalCity.getName());
+			// System.out.println("Current: "+ currentCity.getName());
 			 
 			 if (currentCity.getName() == goalCity.getName() && this.getLocation() != goalCity.getLocation()){
-				 System.out.println("-----HERE------");
+			//	 System.out.println("-----HERE------");
+				 currentCity = (City) currentEdge.to();
 			 }
 			if (this.getLocation() != goalCity.getLocation()) {
 				setGoal(currentCity, goalCity);// Astar inside here
@@ -88,20 +97,45 @@ class RefugeeFamily implements Steppable {
 				int newIndex = 0;
 				if (index != -1) {// if already on the route (in between cities)
 					newIndex = index + 1;
-					this.setLocation(route.getLocation(newIndex));
-					updatePositionOnMap(migrationSim);
 				} else {// new route
 					newIndex = 1;
-					Int2D nextStep = route.getLocation(newIndex);
-					this.setLocation(nextStep);
-					updatePositionOnMap(migrationSim);
+				}				
+				Edge edge = route.getEdge(newIndex);
+				RoadInfo edgeinfo = (RoadInfo)edge.getInfo();
+				if (this.finStatus - edgeinfo.getCost() < 0){
+				isMoving = false;
 				}
+				else{
+				Int2D nextStep = route.getLocation(newIndex);
+				this.setLocation(nextStep);
+				updatePositionOnMap(migrationSim);
 				System.out.println(route.getNumSteps() + ", " + route.getNumEdges());
-				RoadInfo edge = route.getEdge(newIndex);
-				determineDeath(edge, this);
+				this.currentEdge = edge;
+				determineDeath(edgeinfo, this);
+				}
 			}
 		}
 	//	}
+		
+		for (Object c : cities) {
+			City city = (City) c;
+			if (this.location == city.getLocation()) { //if at a city, set current city to that city (keep until reach new city)
+				currentCity = city;
+				RoadInfo edgeinfo = (RoadInfo) this.currentEdge.getInfo();
+				this.finStatus -= edgeinfo.getCost();//if at the end of an edge, subtract the money
+				for (Object o: this.familyMembers){
+					Refugee r = (Refugee)o;
+					city.addMember(r);
+				}
+			}
+			else{
+				for (Object o: this.familyMembers){
+					Refugee r = (Refugee)o;
+					city.getRefugees().remove(r);
+			}
+			}
+			
+		}
 		
 	}
 
@@ -135,7 +169,8 @@ class RefugeeFamily implements Steppable {
 	}
 
 	public void updatePositionOnMap(Migration migrationSim) {
-		for (Refugee r: this.getFamily()){
+		for (Object o: this.getFamily()){
+		Refugee r = (Refugee)o;
 		double randX = migrationSim.random.nextDouble() * 0.3;
 		double randY = migrationSim.random.nextDouble() * 0.3;
 		//System.out.println("Location: " + location.getX() + " " + location.getY());
@@ -147,9 +182,13 @@ class RefugeeFamily implements Steppable {
 	
 	public static void determineDeath(RoadInfo edge, RefugeeFamily refugee){
 		double deaths = edge.getDeaths() * Parameters.ROAD_DEATH_WEIGHT;
-		double r= random.nextDouble();
-		if (r < deaths){//first family member dies (for now)
-			refugee.getFamily().get(0).setHealthStatus(0);
+		double rand= random.nextDouble();
+		if (rand < deaths){//first family member dies (for now)
+			if (refugee.getFamily().size() != 0){
+			Refugee r = (Refugee) refugee.getFamily().get(0);
+			r.setHealthStatus(0);
+			refugee.getFamily().remove(0);
+			}
 		}
 		
 	}
@@ -161,7 +200,8 @@ class RefugeeFamily implements Steppable {
 
 	public void setLocation(Int2D location) {
 		this.location = location;
-		for (Refugee r : familyMembers) {
+		for (Object o: this.familyMembers){
+			Refugee r = (Refugee)o;
 			r.setLocation(location);
 		}
 	}
@@ -194,17 +234,18 @@ class RefugeeFamily implements Steppable {
 		this.currentCity = current;
 	}
 
-	public ArrayList<Refugee> getFamily() {
+	public Bag getFamily() {
 		return familyMembers;
 	}
 
-	public void setFamily(ArrayList<Refugee> family) {
+	public void setFamily(Bag family) {
 		this.familyMembers = family;
 	}
 
 	public double dangerCare() {// 0-1, young, old, or has family weighted more
 		double dangerCare = 0.5;
-		for (Refugee r : familyMembers) {
+		for (Object o: this.familyMembers){
+			Refugee r = (Refugee)o;
 			if (r.getAge() < 12 || r.getAge() > 60) {
 				dangerCare += Parameters.DANGER_CARE_WEIGHT * random.nextDouble();
 			}

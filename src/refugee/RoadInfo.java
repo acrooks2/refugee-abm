@@ -56,6 +56,10 @@ class RoadInfo {
 	public double getSpeed() {
 		return speed;
 	}
+	
+	public double getScaledCost(){
+		return (this.cost - Parameters.MIN_EDGE_COST)/(Parameters.MAX_EDGE_COST - Parameters.MIN_EDGE_COST);
+	}
 
 	public int getPopulation() {
 		return population;

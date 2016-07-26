@@ -31,6 +31,7 @@ import sim.util.media.chart.TimeSeriesChartGenerator;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 
 public class MigrationWithUI extends GUIState {
@@ -105,7 +106,8 @@ public class MigrationWithUI extends GUIState {
 
 		// Adding the city portrayal
 		cityPortrayal.setField(((Migration) state).cityGrid);
-		cityPortrayal.setPortrayalForAll(new OvalPortrayal2D(new Color(255, 154, 146), 5.0, true));
+		//cityPortrayal.setPortrayalForAll(new OvalPortrayal2D(new Color(255, 154, 146), 5.0, true));
+		cityPortrayal.setPortrayalForAll(new OvalPortrayal2D(Color.green, 5.0, true));
 
 		// Adding the road portrayal
 		roadLinkPortrayal.setField(((Migration) state).roadLinks);
@@ -119,21 +121,64 @@ public class MigrationWithUI extends GUIState {
 	// display refresh each step
 	public void setupMovingPortrayals() {
 		
-		cityPortrayal.setField(((Migration) state).cityGrid);
-		cityPortrayal.setPortrayalForAll(new OvalPortrayal2D(){
-			@Override
-			public void draw(Object object, Graphics2D graphics, DrawInfo2D info) {
-			City city = (City) object;
-			paint = new Color(255, 154, 146);
-			//System.out.println(city.getName() + " Population: "  + city.getRefugeePopulation());
-			double scale = city.getScale()*200;
-			System.out.println(scale);
-			super.scale = scale;
-			super.filled = true;
-			super.draw(object, graphics, info);
-			}
-		});
-		
+//		cityPortrayal.setField(((Migration) state).cityGrid);
+//		cityPortrayal.setPortrayalForAll(new OvalPortrayal2D(){
+//			@Override
+//			public void draw(Object object, Graphics2D graphics, DrawInfo2D info) {
+//			City city = (City) object;
+//			paint = new Color(255, 154, 146);
+//			//System.out.println(city.getName() + " Population: "  + city.getRefugeePopulation());
+//			double scale = city.getScale()*200;
+//			System.out.println(scale);
+//			super.scale = scale;
+//			super.filled = true;
+//			super.draw(object, graphics, info);
+//			}
+//		});
+		cityPortrayal.setPortrayalForAll(new OvalPortrayal2D() {
+
+			private static final long serialVersionUID = 546102092597315413L;
+
+				@Override
+	            public void draw(Object object, Graphics2D graphics, DrawInfo2D info)
+	            {
+	                City city = (City)object;
+
+	                Rectangle2D.Double draw = info.draw;
+	                int refugee_pop = city.getRefugeePopulation();
+	                System.out.println("refugee_pop = " + refugee_pop);
+	                Double scale = 1.0;
+	                if(refugee_pop == 0)
+	                	scale = 5.0;
+	                else if(refugee_pop > 0 && refugee_pop <= Parameters.TOTAL_POP * 0.3)
+	                	scale = 15.0;
+	                else if(refugee_pop > Parameters.TOTAL_POP * 0.3 && refugee_pop <= Parameters.TOTAL_POP*0.6)
+	                	scale = 25.0;
+	                else if(refugee_pop > Parameters.TOTAL_POP*0.6)
+	                	scale = 40.0;
+	                
+	                //paint = new Color(0, 128, 255);
+	                //paint = new Color(255, 154, 146);
+	                paint = Color.green;
+	                final double width = draw.width*scale + offset;
+	                final double height = draw.height*scale + offset;
+
+	                graphics.setPaint(paint);
+	                final int x = (int)(draw.x - width / 2.0);
+	                final int y = (int)(draw.y - height / 2.0);
+	                int w = (int)(width);
+	                int h = (int)(height);
+	                        
+	                // draw centered on the origin
+	                if (filled)
+	                    graphics.fillOval(x,y,w,h);
+	                else
+	                    graphics.drawOval(x,y,w,h);
+
+	            }
+	        });
+	  
+	
 		
 		refugeePortrayal.setField(((Migration) this.state).world);
 		refugeePortrayal.setPortrayalForAll(new OvalPortrayal2D() {

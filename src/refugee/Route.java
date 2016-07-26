@@ -1,5 +1,6 @@
 package refugee;
 
+import sim.field.network.Edge;
 import sim.util.Int2D;
 
 import java.lang.reflect.Array;
@@ -14,13 +15,13 @@ import java.util.List;
  */
 public class Route {
 	private List<Int2D> locations;// list of places this person needs to go
-	private List<RoadInfo> edges;
+	private List<Edge> edges;
 	private double distance;
 	private City start;
 	private City end;
 	private double speed;
 
-	public Route(List<Int2D> locations, List<RoadInfo> edges, double distance, City start, City end, double speed) {
+	public Route(List<Int2D> locations, List<Edge> edges, double distance, City start, City end, double speed) {
 		this.locations = locations;
 		this.edges = edges;
 		this.distance = distance;
@@ -46,8 +47,8 @@ public class Route {
 		return location;
 	}
 	
-	public RoadInfo getEdge(int index) {
-		RoadInfo edge = edges.get(index);
+	public Edge getEdge(int index) {
+		Edge edge = edges.get(index);
 		return edge;
 	}
 
@@ -81,13 +82,13 @@ public class Route {
 
 	public Route reverse() {
 		List<Int2D> reversedlocations = new ArrayList<Int2D>(locations.size());
-		//List<RoadInfo> reversedEdges = new ArrayList<RoadInfo>(edges.size());
+		List<Edge> reversedEdges = new ArrayList<Edge>(edges.size());
 		for (int i = locations.size() - 1; i >= 0; i--){
 			reversedlocations.add(locations.get(i));
-			//reversedEdges.add(edges.get(i));
+			reversedEdges.add(edges.get(i));
 		}
-		//return new Route(reversedlocations, reversedEdges, this.distance, this.end, this.start, speed);
-		return new Route(reversedlocations,  this.distance, this.end, this.start, speed);
+		return new Route(reversedlocations, reversedEdges, this.distance, this.end, this.start, speed);
+		//return new Route(reversedlocations,  this.distance, this.end, this.start, speed);
 	}
 
 	/*public void addToEnd(Int2D location) {

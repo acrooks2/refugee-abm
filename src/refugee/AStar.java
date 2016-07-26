@@ -96,7 +96,7 @@ public class AStar {
 				// System.out.println(edge.getWeightedDistance());
 				double edgeweight = edge.getWeightedDistance() * Parameters.DISTANCE_WEIGHT
 						+ edge.getSpeed() * Parameters.SPEED_WEIGHT + edge.getPopulation() * Parameters.POP_WEIGHT
-						+ edge.getCost() * Parameters.COST_WEIGHT
+						+ edge.getScaledCost() * Parameters.COST_WEIGHT
 						+ edge.getTransportLevel() * Parameters.TRANSPORT_LEVEL_WEIGHT
 						+ edge.getDeaths() * Parameters.RISK_WEIGHT * refugee.dangerCare();
 
@@ -357,7 +357,7 @@ public class AStar {
 			RefugeeFamily refugee) {
 		
 		List<Int2D> locations = new ArrayList<Int2D>(100);
-		List<RoadInfo> edges = new ArrayList<RoadInfo>(100);
+		List<Edge> edges = new ArrayList<Edge>(100);
 	
 		// double mod_speed = speed;
 		double totalDistance = 0;
@@ -366,13 +366,14 @@ public class AStar {
 		// start by adding the last one
 		
 		locations.add(0, x.city.location);
-		RoadInfo edge = null;
+		Edge edge = null;
 
 		if (x.cameFrom != null) {
-			edge = (RoadInfo) roadNetwork.getEdge(x.cameFrom.city, x.city).getInfo();
+			edge = (Edge) roadNetwork.getEdge(x.cameFrom.city, x.city);
 			edges.add(0, edge);
+			RoadInfo edgeInfo = (RoadInfo) edge.getInfo();
 			//RoadInfo edge = (RoadInfo) roadNetwork.getEdge(x.cameFrom.city, x.city).getInfo();
-			double mod_speed = edge.getSpeed() * Parameters.TEMPORAL_RESOLUTION;// now
+			double mod_speed = edgeInfo.getSpeed() * Parameters.TEMPORAL_RESOLUTION;// now
 																				// km
 																				// per
 																				// step
@@ -385,7 +386,7 @@ public class AStar {
 			while (x != null) {
 
 				double dist = x.city.location.distance(locations.get(0));
-				edge = (RoadInfo) roadNetwork.getEdge(x.city, to.city).getInfo();
+				edge =  roadNetwork.getEdge(x.city, to.city);
 				
 				while (dist > mod_speed) {
 					locations.add(0, getPointAlongLine(locations.get(0), x.city.location, mod_speed / dist));
@@ -394,8 +395,9 @@ public class AStar {
 					dist = x.city.location.distance(locations.get(0));
 				}
 				if (x.cameFrom != null) {
-					edge = (RoadInfo) roadNetwork.getEdge(x.cameFrom.city, x.city).getInfo();
-					mod_speed = edge.getSpeed() * Parameters.TEMPORAL_RESOLUTION;// now
+					edge = roadNetwork.getEdge(x.cameFrom.city, x.city);
+					 edgeInfo = (RoadInfo) edge.getInfo();
+					mod_speed = edgeInfo.getSpeed() * Parameters.TEMPORAL_RESOLUTION;// now
 																					// km
 																					// per
 																					// step
@@ -422,15 +424,6 @@ public class AStar {
 		//return new Route(locations, totalDistance, start.city, end.city, Parameters.WALKING_SPEED);
 	}
 	
-	static void determineDeath(RoadInfo edge, RefugeeFamily refugee){
-		double deaths = edge.getDeaths() * Parameters.ROAD_DEATH_WEIGHT;
-		double r= random.nextDouble();
-		if (r < deaths){//first family member dies (for now)
-			refugee.getFamily().get(0).setHealthStatus(0);
-		}
-		
-	}
-
 	/**
 	 * Gets a point a certain percent a long the line
 	 * 

@@ -79,6 +79,7 @@ class Migration extends SimState {
 		Steppable chartUpdater = new Steppable() {
 			@Override
 			public void step(SimState simState) {
+				total_dead = 0;
 				long cStep = simState.schedule.getSteps();
 				   Bag allRefugees = world.getAllObjects();
 				   for (Object o: allRefugees){
@@ -89,6 +90,9 @@ class Migration extends SimState {
 							   total_dead++;
 					   //}
 				   }
+				  // total_pop = allRefugees.size();
+				 //  double display_deaths = total_dead/total_pop;
+				   //totalDeadSeries.add(cStep*Parameters.TEMPORAL_RESOLUTION, display_deaths);
 				   totalDeadSeries.add(cStep*Parameters.TEMPORAL_RESOLUTION, total_dead);
 
 			}
