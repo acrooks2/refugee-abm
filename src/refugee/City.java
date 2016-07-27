@@ -154,7 +154,7 @@ class City {
 	}
 	
 	public double getScale(){
-		return refugees.size() * 1.0 / (Parameters.NUM_ORIG_PLACES *Parameters.NUM_ORIG_REFUGEES);
+		return refugees.size() * 1.0 / (Parameters.TOTAL_POP);
 	}
 	
 

@@ -47,11 +47,13 @@ class Migration extends SimState {
 										// from total_pop)
 	public long total_pop = 0; // actual population (not scaled)
 	public int total_dead = 0;
+	public double avg_fin = 0;
 	/*
 	 * charts can include: number dead, specifics for each country, etc.
 	 */
 
 	public Bag refugees;
+	public Bag refugeeFamilies;
 	public Bag cities = new Bag();
 	public Map<Integer, City> cityList = new HashMap<>();
 
@@ -59,6 +61,7 @@ class Migration extends SimState {
 	// HashMap<>();
 	
     public XYSeries totalDeadSeries = new XYSeries(" Dead"); // shows number of recovered agents
+    public XYSeries finSeries = new XYSeries("Finance"); // shows number of recovered agents
     
 	public Migration(long seed) {
 		super(seed);
@@ -68,33 +71,42 @@ class Migration extends SimState {
 	public void start() {
 		super.start();
 		refugees = new Bag();
+		refugeeFamilies = new Bag();
 		MigrationBuilder.initializeWorld(this);
-		for (Object refugee : refugees) {
-			Refugee r = (Refugee) refugee;
-			// System.out.println(r.getHome().getName());
-		}
+
 
 		// charts
 
 		Steppable chartUpdater = new Steppable() {
 			@Override
 			public void step(SimState simState) {
+			//	System.out.println("\n");
 				total_dead = 0;
+				double total_fin = 0;
 				long cStep = simState.schedule.getSteps();
 				   Bag allRefugees = world.getAllObjects();
 				   for (Object o: allRefugees){
 					   //RefugeeFamily family = (RefugeeFamily) o;
-					   Refugee r = (Refugee)o;
+						   Refugee r = (Refugee)o;
+					   
 					  // for (Refugee r: family.getFamily()){
 						   if (r.getHealthStatus() == Constants.DEAD)
 							   total_dead++;
+						   }
 					   //}
+				   for (Object o: refugeeFamilies){
+					   
+					   RefugeeFamily family = (RefugeeFamily)o;
+					   total_fin += family.getFinStatus();
 				   }
 				  // total_pop = allRefugees.size();
 				 //  double display_deaths = total_dead/total_pop;
 				   //totalDeadSeries.add(cStep*Parameters.TEMPORAL_RESOLUTION, display_deaths);
-				   totalDeadSeries.add(cStep*Parameters.TEMPORAL_RESOLUTION, total_dead);
-
+				   double percentage_dead = total_dead * 1.0/Parameters.TOTAL_POP;
+				   totalDeadSeries.add(cStep*Parameters.TEMPORAL_RESOLUTION, percentage_dead);
+				   
+				   double avg_fin = total_fin * 1.0/Parameters.TOTAL_POP;
+				   finSeries.add(cStep*Parameters.TEMPORAL_RESOLUTION, avg_fin);
 			}
 		};
 		this.schedule.scheduleRepeating(chartUpdater);

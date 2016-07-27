@@ -89,6 +89,25 @@ public class MigrationWithUI extends GUIState {
         frameSeries.pack();
         c.registerFrame(frameSeries);
         frameSeries.setVisible(true);
+        
+        
+        
+      //deaths chart
+		TimeSeriesChartGenerator finStatus;
+		finStatus = new TimeSeriesChartGenerator();
+		finStatus.createFrame();
+		finStatus.setSize(dm);
+		finStatus.setTitle("Average Financial Status");
+		finStatus.setRangeAxisLabel("Money Left (USD)");
+		finStatus.setDomainAxisLabel("Hours");
+		finStatus.setMaximumSize(dm);
+		finStatus.setMinimumSize(dmn);
+		finStatus.addSeries(((Migration) this.state).finSeries, null);
+     
+     JFrame frameSeries2 = finStatus.createFrame(this);
+     frameSeries2.pack();
+     c.registerFrame(frameSeries2);
+     frameSeries2.setVisible(true);
 
 
 		// ((Console) c).pressPlay();
@@ -146,7 +165,7 @@ public class MigrationWithUI extends GUIState {
 
 	                Rectangle2D.Double draw = info.draw;
 	                int refugee_pop = city.getRefugeePopulation();
-	                System.out.println("refugee_pop = " + refugee_pop);
+	              //  System.out.println("refugee_pop = " + refugee_pop);
 	                Double scale = 1.0;
 	                if(refugee_pop == 0)
 	                	scale = 5.0;

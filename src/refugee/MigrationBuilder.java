@@ -40,13 +40,15 @@ class MigrationBuilder {
 	private static NormalDistribution nd = new NormalDistribution(Parameters.AVG_FAMILY_SIZE,
 			Parameters.FAMILY_SIZE_SD);
 	private static HashMap<Integer, ArrayList<Double>> age_dist;
+	private static HashMap<Integer, Double> pop_dist;
 
 	// initialize world
 	public static void initializeWorld(Migration sim) {
 
 		migrationSim = sim;
-
+		
 		age_dist = new HashMap<Integer, ArrayList<Double>>();
+		pop_dist = new HashMap<Integer, Double>();
 		String[] cityAttributes = { "ID", "NAME_1", "ORIG", "POP", "SPOP_1", "QUOTA_1", "VIOL_1", "ECON_1", "FAMILY_1" };
 		String[] roadAttributes = { "ID", "FR", "TO", "SPEED_1", "POP", "COST", "TLEVEL_1", "DEATH_1", "LENGTH_1" };
 		String[] regionAttributes = { "REGION", "SQKM" };
@@ -84,6 +86,7 @@ class MigrationBuilder {
 		makeCities(migrationSim.cityPoints, migrationSim.cityGrid, migrationSim.cities, migrationSim.cityList);
 		extractFromRoadLinks(migrationSim.roadLinks, migrationSim);
 		setUpAgeDist(Parameters.AGE_DIST);
+		setUpPopDist(Parameters.POP_DIST);
 
 		// add refugees
 		addRefugees();
@@ -176,11 +179,12 @@ class MigrationBuilder {
 			City city = (City) c;
 			if (city.getOrigin() == 1) {
 				int currentPop = 0;// 1,4,5,10,3,14,24
-				while (currentPop <= Parameters.NUM_ORIG_REFUGEES) { // test
-																		// refugee
-																		// points
+				int citypop = (int)Math.round(pop_dist.get(city.getID()) * Parameters.TOTAL_POP);
+				System.out.println(city.getName() + ": " + citypop);
+				while (currentPop <= citypop) { 
 					RefugeeFamily r = createRefugeeFamily(city);
 					System.out.println(r.getFamily().size());
+					migrationSim.refugeeFamilies.add(r);
 					for (Object o: r.getFamily()){
 						Refugee refugee = (Refugee)o;
 						currentPop++;
@@ -259,11 +263,35 @@ class MigrationBuilder {
 
 	}
 
+	private static void setUpPopDist(String pop_dist_file) {
+		try {
+			// buffer reader for age distribution data
+			CSVReader csvReader = new CSVReader(new FileReader(new File(pop_dist_file)));
+			//csvReader.readLine();// skip the headers
+			List<String> line = csvReader.readLine();
+			while (!line.isEmpty()) {
+				// read in the county ids
+				int city_id = NumberFormat.getNumberInstance(java.util.Locale.US).parse(line.get(0)).intValue();
+				// relevant info is from 5 - 21
+				double percentage = Double.parseDouble(line.get(1));
+				pop_dist.put(city_id, percentage);
+				line = csvReader.readLine();
+			}
+			System.out.println(pop_dist);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (java.text.ParseException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	private static void setUpAgeDist(String age_dist_file) {
 		try {
 			// buffer reader for age distribution data
 			CSVReader csvReader = new CSVReader(new FileReader(new File(age_dist_file)));
-			csvReader.readLine();// skip the headers
+			csvReader.readLine();
 			List<String> line = csvReader.readLine();
 			while (!line.isEmpty()) {
 				// read in the county ids
@@ -293,6 +321,8 @@ class MigrationBuilder {
 			e.printStackTrace();
 		}
 	}
+	
+
 
 	private static double pick_fin_status() {
 		// TODO Auto-generated method stub

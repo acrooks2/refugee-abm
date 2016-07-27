@@ -387,14 +387,24 @@ public class AStar {
 
 				double dist = x.city.location.distance(locations.get(0));
 				edge =  roadNetwork.getEdge(x.city, to.city);
-				
+				 edgeInfo = (RoadInfo) edge.getInfo();
+				mod_speed = edgeInfo.getSpeed() * Parameters.TEMPORAL_RESOLUTION;// now
+																				// km
+																				// per
+																				// step
+				// convert speed to cell block per step
+				mod_speed = Parameters.convertFromKilometers(mod_speed);
+
 				while (dist > mod_speed) {
 					locations.add(0, getPointAlongLine(locations.get(0), x.city.location, mod_speed / dist));
 					//System.out.println(x.city.getName());
 					edges.add(0, edge);
 					dist = x.city.location.distance(locations.get(0));
 				}
-				if (x.cameFrom != null) {
+                locations.add(0, getPointAlongLine(locations.get(0), x.city.location, 1)); //**CRUCIAL***
+                edges.add(0,  edge);
+                
+				/*if (x.cameFrom != null) {
 					edge = roadNetwork.getEdge(x.cameFrom.city, x.city);
 					 edgeInfo = (RoadInfo) edge.getInfo();
 					mod_speed = edgeInfo.getSpeed() * Parameters.TEMPORAL_RESOLUTION;// now
@@ -407,7 +417,7 @@ public class AStar {
 
 				if (x.cameFrom == null) {
 					refugee.setCurrent(x.city);
-				}
+				}*/
 				to = x;
 				x = x.cameFrom;
 				if (x != null && x.cameFrom != null)
@@ -418,7 +428,7 @@ public class AStar {
 		edges.add(0, edge);	
 		
 		}
-		locations.add(0, start.city.location);
+		//locations.add(0, start.city.location);
 		edges.add(0, edge);
 		return new Route(locations, edges, totalDistance, start.city, end.city, Parameters.WALKING_SPEED);
 		//return new Route(locations, totalDistance, start.city, end.city, Parameters.WALKING_SPEED);
