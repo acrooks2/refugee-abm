@@ -84,6 +84,9 @@ class Migration extends SimState {
 				total_dead = 0;
 				double total_fin = 0;
 				long cStep = simState.schedule.getSteps();
+				if (cStep/24 > 420){
+					simState.finish();
+				}
 				   Bag allRefugees = world.getAllObjects();
 				   for (Object o: allRefugees){
 					   //RefugeeFamily family = (RefugeeFamily) o;
@@ -151,6 +154,11 @@ class Migration extends SimState {
 				break;
 			}
 		}
+		String output_path = "output/";
+		String file_name = "output1";
+		File output = new File(output_path + file_name);
+		simState.writeToCSV(output_path, file_name);
+		
 
 		// create our run directory
 
@@ -164,5 +172,33 @@ class Migration extends SimState {
 		System.exit(0);
 
 	}
+	
+    public void writeToCSV(String output_path, String file_name)
+    {
+        try
+        {
+            PrintWriter writer = new PrintWriter(output_path + file_name);
+
+            for(Object c: cities)
+            {
+            	City city = (City) c;
+                writer.print(city.getName() + ",");
+            }
+            writer.println();
+            for(Object c: cities)
+            {
+            	City city = (City) c;
+                writer.print(city.getDepartures() + ",");
+            }
+            
+            
+
+            writer.close();
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
 
 }

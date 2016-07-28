@@ -42,6 +42,14 @@ public class Route {
 	/**
 	 * @return next location to move, null if no more moves
 	 */
+	
+	public List<Int2D> getLocations(){
+		return locations;
+	}
+	
+	public List<Edge> getEdges(){
+		return edges;
+	}
 	public Int2D getLocation(int index) {
 		Int2D location = locations.get(index);
 		return location;
@@ -53,11 +61,11 @@ public class Route {
 	}
 
 	public int getLocIndex(Int2D loc) {
-		return locations.indexOf(loc);
+		return locations.lastIndexOf(loc);
 	}
 	
 	public int getEdgeIndex(RoadInfo edge) {
-		return edges.indexOf(edge);
+		return edges.lastIndexOf(edge);
 	}
 
 	public double getTotalDistance() {
@@ -78,6 +86,21 @@ public class Route {
 
 	public City getEnd() {
 		return end;
+	}
+	
+	public boolean equals(Route r){
+		if (locations.containsAll(r.getLocations()) && edges.containsAll(r.getEdges())){
+			return true;
+		}
+		else
+			return false;
+	}
+	
+	public void printRoute(){
+		for (Edge e: edges){
+			City c = (City) e.getTo();
+			System.out.print(c.getName() + " ");
+		}
 	}
 
 	public Route reverse() {

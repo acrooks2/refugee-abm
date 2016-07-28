@@ -20,6 +20,8 @@ class City {
 	private double economy; // 3
 	private double familyPresence; // 2
 	private HashSet<Refugee> refugees;
+	private int departures;
+	private int arrivals;
 
 	// need name, get name, set name
 	//private MigrationBuilder.Node nearestNode;
@@ -38,6 +40,7 @@ class City {
 		this.familyPresence = familyPresence;
 		this.origin = origin;
 		this.refugees = new HashSet<Refugee>();
+		this.departures = 0;
 	}
 
 	public Int2D getLocation() {
@@ -111,7 +114,9 @@ class City {
 	public void setEconomy(double economy) {
 		this.economy = economy;
 	}
-
+	public int getDepartures(){
+		return departures;
+	}
 	public double getFamilyPresence() {
 		return familyPresence;
 	}
@@ -120,12 +125,22 @@ class City {
 		this.familyPresence = familyPresence;
 	}
 
-	public void addMembers(Bag people) {
+	/*public void addMembers(Bag people) {
 		refugees.addAll(people);
-	}
+	}*/
 
 	public void addMember(Refugee r) {
 		refugees.add(r);
+	}
+	
+	/*public void removeMembers(Bag people){
+		refugees.remove(people);
+		passerbyCount += people.size();
+	}*/
+	
+	public void removeMember(Refugee r){
+		if (refugees.remove(r))				
+			departures ++;
 	}
 
 	/*public void setNearestNode(MigrationBuilder.Node node) {

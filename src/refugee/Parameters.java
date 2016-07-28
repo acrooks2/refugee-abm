@@ -1,6 +1,7 @@
 package refugee;
 
 class Parameters {
+
 	public static double TEMPORAL_RESOLUTION = 0.4;// steps per hour
 	//public static int NUM_ORIG_REFUGEES = 1;
 	public static int NUM_ORIG_PLACES = 7;
@@ -11,6 +12,10 @@ class Parameters {
 	// -------Agent Care Weights-------//
 	public static double DANGER_CARE_WEIGHT = 0.2;
 	public static double FAMILY_ABROAD_CARE_WEIGHT = 0.2;
+	public static double POP_CARE = 0.75;
+	public static double ECON_CARE = 0.75;
+	//-------Agent Decision Weights----//
+	public static double GOAL_CHANGE_PROB = 0.1;
 	// -------Edge Weights-------//
 	public static double ROAD_DEATH_WEIGHT = 0.1;
 	public static double MAX_EDGE_LENGTH = 1337284.917613;

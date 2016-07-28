@@ -25,6 +25,9 @@ class RefugeeFamily implements Steppable {
 	private City goal;
 	static MersenneTwisterFast random = new MersenneTwisterFast();
 	private boolean isMoving;
+	private HashMap<Route, Integer> cachedRoutes;
+	private HashMap<City, Integer> cachedGoals;
+	private boolean goalChanged;
 
 	public RefugeeFamily(Int2D location, int size, City home, double finStatus) {
 		this.location = location;
@@ -35,17 +38,19 @@ class RefugeeFamily implements Steppable {
 		currentCity = home;
 		isMoving = true;
 		// routePosition = 0;
+		cachedRoutes = new HashMap<Route, Integer>();
+		goalChanged = false;
 	}
 
 	@Override
 	public void step(SimState state) {
 		//random = new MersenneTwisterFast();
 		// System.out.println("here");
+		System.out.println();
 		Migration migrationSim = (Migration) state;
 		Bag cities = migrationSim.cities; 
 		City goalCity = calcGoalCity(cities);
-		if (goalCity.getName().compareTo(goal.getName()) != 0)
-			System.out.println("-----GOAL CHANGE------");
+
 		//if (this.goal.getName().compareTo(goalCity.getName()) != 0)
 		//System.out.println("Goal Changed");
 	//if (goalCity.getName().compareTo("London") != 0 || goalCity.getName().compareTo("Munich") != 0)
@@ -71,26 +76,47 @@ class RefugeeFamily implements Steppable {
 			
 		}*/
 		
-		if (this.location == goalCity.location)
+		if (this.location == goalCity.location){
+			goal = goalCity;
 			isMoving = false;
-
-		if (finStatus == 0.0) {
+		}
+		else if (finStatus == 0.0) {
 			System.out.println("poor");
 			return;}
 		else if (isMoving == false)
 			return;
 		 else {
 			 System.out.println(finStatus);
-			this.goal = goalCity;			
-			System.out.println("Home: " + this.getHome().getName() + " | Goal " + goalCity.getName());
-			 System.out.println(this + " Current: "+ currentCity.getName());
 			 
-			 if (currentCity.getName() == goal.getName() && this.getLocation() != goal.getLocation()){
-				 System.out.println("-----HERE------");
-				 currentCity = (City) currentEdge.to();
-			 }
-			if (this.getLocation() != goal.getLocation()) {
-				setGoal(currentCity, goal);// Astar inside here
+				if (goalCity.getName().compareTo(goal.getName()) != 0){
+					double r = random.nextDouble();
+					if (r < Parameters.GOAL_CHANGE_PROB){
+					this.goal = goalCity;		
+					System.out.println("-----GOAL CHANGE------");
+					goalChanged = true;
+					}
+					
+					if (goal == home){
+						this.goal = goalCity;
+						goalChanged = true;
+					}
+				}
+				else
+					goalChanged = false;
+				
+
+			 
+			if (this.getLocation().getX() != goal.getLocation().getX() || this.getLocation().getY() != goal.getLocation().getY()) {
+
+				
+				System.out.println("Home: " + this.getHome().getName() + " | Goal " + goal.getName());
+				 System.out.println(this + " Current: "+ currentCity.getName());			 
+				 if (currentCity.getName() == goal.getName() && this.getLocation() != goal.getLocation()){
+					 System.out.println("-----HERE------");
+					 currentCity = (City) currentEdge.to();
+				 }
+				//setGoal(currentCity, goal);
+				route = calcRoute(currentCity, goal);// Astar inside here
 				//System.out.println(route);
 				if (route == null){
 					System.out.println("No route found:");
@@ -117,13 +143,15 @@ class RefugeeFamily implements Steppable {
 				//System.out.println(route.getNumSteps() + ", " + route.getNumEdges());
 				this.currentEdge = edge;
 				determineDeath(edgeinfo, this);
+				route.printRoute();
 				}
 				
 				City city = (City)currentEdge.getTo();
 				if (this.location.getX() == city.getLocation().getX() && this.location.getY() == city.getLocation().getY()){
 					currentCity = city;
 					RoadInfo einfo = (RoadInfo) this.currentEdge.getInfo();
-					this.finStatus -= edgeinfo.getCost();//if at the end of an edge, subtract the money
+					this.finStatus -= einfo.getCost();//if at the end of an edge, subtract the money
+					//city.addMembers(this.familyMembers);
 					for (Object or: this.familyMembers){
 						Refugee rr = (Refugee)or;
 						city.addMember(rr);
@@ -136,7 +164,7 @@ class RefugeeFamily implements Steppable {
 						City cremove = (City)c;
 						for (Object o: this.familyMembers){
 							Refugee r = (Refugee)o;
-							cremove.getRefugees().remove(r);
+							cremove.removeMember(r);
 					}
 				}
 				}
@@ -160,8 +188,10 @@ class RefugeeFamily implements Steppable {
 		double max = 0.0;
 		for (Object city : citylist) {
 			City c = (City) city;
-			double cityDesirability = dangerCare() * c.getViolence() + familyAbroadCare() * c.getFamilyPresence()
-					+ c.getEconomy() + c.getScaledPopulation();
+			double cityDesirability = dangerCare() * c.getViolence() 
+					+ familyAbroadCare() * c.getFamilyPresence()
+					+ c.getEconomy() * (Parameters.ECON_CARE + random.nextDouble()/4)
+					+ c.getScaledPopulation() * (Parameters.POP_CARE + random.nextDouble()/4);
 			if (c.getRefugeePopulation() + familyMembers.size() >= c.getQuota()) // if
 																					// reached
 																					// quota,
@@ -180,8 +210,32 @@ class RefugeeFamily implements Steppable {
 
 	private void setGoal(City from, City to) {
 		this.goal = to;
-		this.route = from.getRoute(to, this);
+		//this.route = from.getRoute(to, this);
 		//this.routePosition = 0;
+	}
+	
+	private Route calcRoute(City from, City to){
+		Route newRoute = from.getRoute(to,  this);
+		//if there's a route that contains this route
+		//access it and see if decided not to use it before
+		//use new route if old one changed mind, keep label as good
+		//if not continue with it and keep label as good
+		
+		//TODO **** can't return back to an old route unless goal has changed
+		for (Route r: cachedRoutes.keySet()){
+			if (r.equals(newRoute)){
+				System.out.println("---------FOUND SAME---------");
+				if (cachedRoutes.get(r) == 1 || goalChanged)
+					return newRoute;
+				else
+					return this.route;
+			}
+			else
+				cachedRoutes.put(r, 0);
+	}
+		cachedRoutes.put(newRoute, 1);
+		return newRoute;
+	
 	}
 
 	public void updatePositionOnMap(Migration migrationSim) {
