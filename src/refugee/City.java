@@ -114,9 +114,15 @@ class City {
 	public void setEconomy(double economy) {
 		this.economy = economy;
 	}
+	
 	public int getDepartures(){
 		return departures;
 	}
+	
+	public int getArrivals(){
+		return arrivals;
+	}
+	
 	public double getFamilyPresence() {
 		return familyPresence;
 	}
@@ -131,6 +137,7 @@ class City {
 
 	public void addMember(Refugee r) {
 		refugees.add(r);
+		arrivals++;
 	}
 	
 	/*public void removeMembers(Bag people){

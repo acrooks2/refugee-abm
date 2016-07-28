@@ -178,7 +178,7 @@ class Migration extends SimState {
         try
         {
             PrintWriter writer = new PrintWriter(output_path + file_name);
-
+            //edit to do columns
             for(Object c: cities)
             {
             	City city = (City) c;
@@ -189,6 +189,12 @@ class Migration extends SimState {
             {
             	City city = (City) c;
                 writer.print(city.getDepartures() + ",");
+            }
+            writer.println();
+            for(Object c: cities)
+            {
+            	City city = (City) c;
+                writer.print(city.getArrivals() + ",");
             }
             
             
