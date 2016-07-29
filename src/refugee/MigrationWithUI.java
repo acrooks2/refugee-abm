@@ -39,6 +39,9 @@ public class MigrationWithUI extends GUIState {
 	JFrame displayFrame; // frame containing all the displays
 	FieldPortrayal2D cityPortrayal = new SparseGridPortrayal2D();
 	GeomVectorFieldPortrayal regionPortrayal = new GeomVectorFieldPortrayal();
+	GeomVectorFieldPortrayal countryPortrayal = new GeomVectorFieldPortrayal();
+	GeomVectorFieldPortrayal countryBndPortrayal = new GeomVectorFieldPortrayal();
+	GeomVectorFieldPortrayal roadPortrayal = new GeomVectorFieldPortrayal();
 	GeomVectorFieldPortrayal roadLinkPortrayal = new GeomVectorFieldPortrayal();
 	ContinuousPortrayal2D refugeePortrayal = new ContinuousPortrayal2D();
 
@@ -52,29 +55,35 @@ public class MigrationWithUI extends GUIState {
 
 		// set dimen and position of controller
 		((Console) c).setSize(350, 80);
-		((Console) c).setLocation(0, 680);
+		((Console) c).setLocation(0, 520);
 
-		display = new Display2D(1024, 760, this); // creates the display
+		display = new Display2D(600, 520, this); // creates the display
 		// display.setRefresRate(32);
 		display.setScale(1.2);
 
 		display.attach(regionPortrayal, "Regions");
-		display.attach(roadLinkPortrayal, "Roads");
+		display.attach(countryPortrayal, "Counties (area)");
+		display.attach(countryBndPortrayal, "Countries (boundary)");
+		//display.attach(roadPortrayal, "Roads");
 		display.attach(cityPortrayal, "Cities");
+		display.attach(roadLinkPortrayal, "Routes");
 		display.attach(refugeePortrayal, "Refugees");
 
 		displayFrame = display.createFrame();
 		c.registerFrame(displayFrame);
 		displayFrame.setVisible(true);
-		displayFrame.setSize(1280, 1024);
+		displayFrame.setSize(800, 520);
+		display.setBackdrop(new Color(65,141,199));
 		
 		//deaths chart
-	       Dimension dm = new Dimension(300,300);
-	        Dimension dmn = new Dimension(300,300);
+	    Dimension dm = new Dimension(360,120);
+	    Dimension dmn = new Dimension(120,100);
+	    
 		TimeSeriesChartGenerator healthStatus;
         healthStatus = new TimeSeriesChartGenerator();
-        healthStatus.createFrame();
+        JFrame frameSeries = healthStatus.createFrame();
         healthStatus.setSize(dm);
+        
         healthStatus.setTitle("Health Status");
         healthStatus.setRangeAxisLabel("Number of People");
         healthStatus.setDomainAxisLabel("Hours");
@@ -84,15 +93,16 @@ public class MigrationWithUI extends GUIState {
 //        chartSeriesCholera.setPreferredChartSize(400, 300); // lets it be small
 
         healthStatus.addSeries(((Migration) this.state).totalDeadSeries, null);
+        healthStatus.setProportion(2.2);
+       // JFrame frameSeries = healthStatus.createFrame(this);
+        frameSeries.setSize(480,260);
         
-        JFrame frameSeries = healthStatus.createFrame(this);
-        frameSeries.pack();
+        frameSeries.setLocation(800, 0);
+      //  frameSeries.pack();
         c.registerFrame(frameSeries);
         frameSeries.setVisible(true);
-        
-        
-        
-      //deaths chart
+     
+      //Financial chart
 		TimeSeriesChartGenerator finStatus;
 		finStatus = new TimeSeriesChartGenerator();
 		finStatus.createFrame();
@@ -103,12 +113,92 @@ public class MigrationWithUI extends GUIState {
 		finStatus.setMaximumSize(dm);
 		finStatus.setMinimumSize(dmn);
 		finStatus.addSeries(((Migration) this.state).finSeries, null);
+		finStatus.setProportion(2.2);
      
      JFrame frameSeries2 = finStatus.createFrame(this);
-     frameSeries2.pack();
+     
+     frameSeries2.setSize(480,260);
+     frameSeries2.setLocation(800, 260);
+     //frameSeries2.pack();
      c.registerFrame(frameSeries2);
      frameSeries2.setVisible(true);
 
+     StandardDialFrame dialFrame = new StandardDialFrame();
+     DialBackground ddb = new DialBackground(Color.white);
+     dialFrame.setBackgroundPaint(Color.lightGray);
+     dialFrame.setForegroundPaint(Color.darkGray);
+
+     DialPlot plot = new DialPlot();
+     plot.setView(0.0, 0.0, 1.0, 1.0);
+     plot.setBackground(ddb);
+     plot.setDialFrame(dialFrame);
+
+     plot.setDataset(0, ((Migration) this.state).hourDialer);
+     plot.setDataset(1,((Migration) this.state).dayDialer);
+
+
+     DialTextAnnotation annotation1 = new DialTextAnnotation("Hour");
+     annotation1.setFont(new Font("Dialog", Font.BOLD, 14));
+     annotation1.setRadius(0.1);
+     plot.addLayer(annotation1);
+
+
+//     DialValueIndicator dvi = new DialValueIndicator(0);
+//     dvi.setFont(new Font("Dialog", Font.PLAIN, 10));
+//     dvi.setOutlinePaint(Color.black);
+//     plot.addLayer(dvi);
+//
+
+     DialValueIndicator dvi2 = new DialValueIndicator(1);
+     dvi2.setFont(new Font("Dialog", Font.PLAIN, 22));
+     dvi2.setOutlinePaint(Color.red);
+     dvi2.setRadius(0.3);
+     plot.addLayer(dvi2);
+
+     DialTextAnnotation annotation2 = new DialTextAnnotation("Day");
+     annotation2.setFont(new Font("Dialog", Font.BOLD, 18));
+     annotation2.setRadius(0.4);
+     plot.addLayer(annotation2);
+
+     StandardDialScale scale = new StandardDialScale(0.0, 23.99, 90, -360, 1.0,59);
+     scale.setTickRadius(0.9);
+     scale.setTickLabelOffset(0.15);
+     scale.setTickLabelFont(new Font("Dialog", Font.PLAIN, 12));
+     plot.addScale(0, scale);
+     scale.setMajorTickPaint(Color.black);
+     scale.setMinorTickPaint(Color.lightGray);
+
+
+
+
+//     StandardDialScale scale2 = new StandardDialScale(1, 7, -150, -240, 1,1);
+//     scale2.setTickRadius(0.50);
+//     scale2.setTickLabelOffset(0.15);
+//     scale2.setTickLabelPaint(Color.RED);
+//     scale2.setTickLabelFont(new Font("Dialog", Font.PLAIN, 12));
+//     plot.addScale(1, scale2);
+//
+//     DialPointer needle2 = new DialPointer.Pin(1);
+//     plot.addPointer(needle2);
+//     needle2.setRadius(0.40);
+     // plot.mapDatasetToScale(1, 1);
+
+     DialPointer needle = new DialPointer.Pointer(0);
+     plot.addPointer(needle);
+
+
+     DialCap cap = new DialCap();
+     cap.setRadius(0.10);
+     plot.setCap(cap);
+
+     JFreeChart chart1 = new JFreeChart(plot);
+     ChartFrame timeframe = new ChartFrame("Time Chart", chart1);
+     timeframe.setVisible(true);
+     timeframe.setSize(200, 100);
+     //timeframe.pack();
+     c.registerFrame(timeframe);
+
+     
 
 		// ((Console) c).pressPlay();
 	}
@@ -126,15 +216,26 @@ public class MigrationWithUI extends GUIState {
 		// Adding the city portrayal
 		cityPortrayal.setField(((Migration) state).cityGrid);
 		//cityPortrayal.setPortrayalForAll(new OvalPortrayal2D(new Color(255, 154, 146), 5.0, true));
-		cityPortrayal.setPortrayalForAll(new OvalPortrayal2D(Color.green, 5.0, true));
+		cityPortrayal.setPortrayalForAll(new OvalPortrayal2D(new Color(255, 137, 95), 5.0, true));
 
-		// Adding the road portrayal
+		// Adding the roadlinks portrayal
 		roadLinkPortrayal.setField(((Migration) state).roadLinks);
-		roadLinkPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(24, 28, 242), 1, true));
-
+		roadLinkPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(0,102,51), 1, true));
+		
+		// Adding the road portrayal
+		roadPortrayal.setField(((Migration) state).roads);
+		roadPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(255, 199, 199), 1, false));
+		
 		// Adding the region portrayal
 		regionPortrayal.setField(((Migration) state).regions);
-		regionPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(188, 195, 196), 1, true));
+		regionPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(128, 128, 128), 2, false));
+		
+		// Adding the country portrayal
+		countryPortrayal.setField(((Migration) state).countries);
+		countryPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(249, 208, 138), 1, true));
+		countryBndPortrayal.setField(((Migration) state).countries);
+		countryBndPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(64,64,64), 1, false));		
+
 	}
 
 	// display refresh each step
@@ -178,7 +279,7 @@ public class MigrationWithUI extends GUIState {
 	                
 	                //paint = new Color(0, 128, 255);
 	                //paint = new Color(255, 154, 146);
-	                paint = Color.green;
+	                paint = new Color(255, 137, 95);
 	                final double width = draw.width*scale + offset;
 	                final double height = draw.height*scale + offset;
 
@@ -197,7 +298,6 @@ public class MigrationWithUI extends GUIState {
 	            }
 	        });
 	  
-	
 		
 		refugeePortrayal.setField(((Migration) this.state).world);
 		refugeePortrayal.setPortrayalForAll(new OvalPortrayal2D() {
@@ -206,19 +306,19 @@ public class MigrationWithUI extends GUIState {
 
 				Refugee refugee = (Refugee) object;
 				if (refugee.getHealthStatus() == Constants.DEAD)
-					paint = new Color(255, 0, 0);
+					paint = Color.RED;
 				// System.out.println(refugee);
 				else
-					paint = new Color(0, 100, 100);
+					paint = Color.GREEN;
 				//super.draw(object, graphics, info);
 				super.filled = true;
-				super.scale = 3;
+				super.scale = 5;
 				super.draw(object, graphics, info);
 			}
 		});
 
 		display.reset();
-		display.setBackdrop(Color.WHITE);
+		display.setBackdrop(new Color(65,141,199));
 		display.repaint();
 	}
 

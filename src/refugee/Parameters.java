@@ -2,14 +2,14 @@ package refugee;
 
 class Parameters {
 
-	public static double TEMPORAL_RESOLUTION = 0.4;// steps per hour
+	public static double TEMPORAL_RESOLUTION = 0.2;// steps per hour
 	//public static int NUM_ORIG_REFUGEES = 1;
 	public static int NUM_ORIG_PLACES = 7;
 	public static int TOTAL_POP = 100;
 	// ----Refugee Characteristic Weights----//
 	public static double AVG_FAMILY_SIZE = 6.3; // http://www.acted.org/en/food-security-situation-and-livelihood-intervention-opportunities-syrians-refugees-and-host-communit
 	public static double FAMILY_SIZE_SD = 2.92; // same as above
-	// -------Agent Care Weights-------//
+	// -------Agent City Care Weights-------//
 	public static double DANGER_CARE_WEIGHT = 0.2;
 	public static double FAMILY_ABROAD_CARE_WEIGHT = 0.2;
 	public static double POP_CARE = 0.75;
@@ -26,7 +26,7 @@ class Parameters {
 	public static double RISK_WEIGHT = 1.5;
 	public static double DISTANCE_WEIGHT = 1.0;
 	public static double SPEED_WEIGHT = 1.0;
-	public static double POP_WEIGHT = 0.5;
+	public static double POP_WEIGHT = 200.0;
 	public static double TRANSPORT_LEVEL_WEIGHT = 0.5;
 	public static double HEU_WEIGHT = 0.00000001;
 
@@ -45,11 +45,14 @@ class Parameters {
 	// public static String AGE_DIST_PATH = "";//have, but only take columns
 	// that say TOT
 	public static String REGION_SHP = "data/shapefiles/region.shp";// shapefile
-	public static String ROAD_SHP = "data/shapefiles/roadsatt7.shp";// shapefile 
-	public static String CITY_SHP = "data/shapefiles/cityatt9.shp";// have
+	public static String COUNTRY_SHP = "data/shapefiles/country.shp";// shapefile
+	public static String CITY_SHP = "data/shapefiles/city.shp";// have
+	public static String ROAD_SHP = "data/shapefiles/roads.shp";// shapefile 
+	public static String ROADLINK_SHP = "data/shapefiles/routes5.shp";// shapefile 
 	public static String AGE_DIST = "data/csvs/age_dist2.csv";// have
 	public static String POP_DIST = "data/csvs/pop_dist.csv";
 	// Edge attributes
+
 
 	// population flow parameters
 

@@ -32,7 +32,9 @@ class Migration extends SimState {
 	public SparseGrid2D cityGrid;
 	public Network roadNetwork = new Network();
 	public GeomVectorField regions;
-	public GeomVectorField roadLinks;
+	public GeomVectorField countries;
+	public GeomVectorField roads;
+	public GeomVectorField roadLinks;   //roadLinks;
 	public GeomVectorField cityPoints;
 
 	public GeomVectorField adminBoundaries;// TODO may not be needed
@@ -63,6 +65,10 @@ class Migration extends SimState {
     public XYSeries totalDeadSeries = new XYSeries(" Dead"); // shows number of recovered agents
     public XYSeries finSeries = new XYSeries("Finance"); // shows number of recovered agents
     
+    // timer graphics
+    DefaultValueDataset hourDialer = new DefaultValueDataset(); // shows the current hour
+    DefaultValueDataset dayDialer = new DefaultValueDataset(); // counts
+    
 	public Migration(long seed) {
 		super(seed);
 	}
@@ -87,6 +93,12 @@ class Migration extends SimState {
 				if (cStep/24 > 420){
 					simState.finish();
 				}
+				
+                double day = cStep*Parameters.TEMPORAL_RESOLUTION/24;
+                double hour = cStep*Parameters.TEMPORAL_RESOLUTION%24;
+                hourDialer.setValue(hour);
+                dayDialer.setValue(day);
+                
 				   Bag allRefugees = world.getAllObjects();
 				   for (Object o: allRefugees){
 					   //RefugeeFamily family = (RefugeeFamily) o;

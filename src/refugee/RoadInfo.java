@@ -15,16 +15,18 @@ class RoadInfo {
 	private double distance;
 	private double speed;
 	private int population;
+	private double spop;
 	private double cost;
 	private double transportLevel;
 	private double deaths;
 
-	public RoadInfo(Geometry path, int from, int to, double speed, double distance, double cost, double transportLevel,
+	public RoadInfo(Geometry path, int from, int to, double speed, double spop, double distance, double cost, double transportLevel,
 			double deaths) {
 		this.population = 0; // starts with no one traveling
 		this.path = path;
 		this.from = from;
 		this.to = to;
+		this.spop = spop;
 		this.speed = speed;
 		this.distance = distance;
 		this.cost = cost;
@@ -61,8 +63,8 @@ class RoadInfo {
 		return (this.cost - Parameters.MIN_EDGE_COST)/(Parameters.MAX_EDGE_COST - Parameters.MIN_EDGE_COST);
 	}
 
-	public int getPopulation() {
-		return population;
+	public double getScaledPopulation() {
+		return spop;
 	}
 
 	public double getCost() {

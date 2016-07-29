@@ -95,7 +95,7 @@ public class AStar {
 				RoadInfo edge = (RoadInfo) e.getInfo();
 				// System.out.println(edge.getWeightedDistance());
 				double edgeweight = edge.getWeightedDistance() * Parameters.DISTANCE_WEIGHT
-						+ edge.getSpeed() * Parameters.SPEED_WEIGHT + edge.getPopulation() * Parameters.POP_WEIGHT
+						+ edge.getSpeed() * Parameters.SPEED_WEIGHT + edge.getScaledPopulation() * Parameters.POP_WEIGHT
 						+ edge.getScaledCost() * Parameters.COST_WEIGHT
 						+ edge.getTransportLevel() * Parameters.TRANSPORT_LEVEL_WEIGHT
 						+ edge.getDeaths() * Parameters.RISK_WEIGHT * refugee.dangerCare();
@@ -242,7 +242,7 @@ public class AStar {
 	 * @return notional "distance" between the given allRoadCities.
 	 */
 	static double heuristic(City x, City y) {
-		return x.location.distance(y.location);// * Parameters.HEU_WEIGHT;
+		return x.location.distance(y.location) * Parameters.HEU_WEIGHT;
 	}
 
 	/**

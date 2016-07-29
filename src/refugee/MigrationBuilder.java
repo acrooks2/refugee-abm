@@ -49,29 +49,37 @@ class MigrationBuilder {
 		
 		age_dist = new HashMap<Integer, ArrayList<Double>>();
 		pop_dist = new HashMap<Integer, Double>();
+
+		String[] regionAttributes = { "REGION"};
+		String[] countryAttributes = { "COUNTRY"};
+		String[] roadAttributes = { "NAME1", "TYPE"};
 		String[] cityAttributes = { "ID", "NAME_1", "ORIG", "POP", "SPOP_1", "QUOTA_1", "VIOL_1", "ECON_1", "FAMILY_1" };
-		String[] roadAttributes = { "ID", "FR", "TO", "SPEED_1", "POP", "COST", "TLEVEL_1", "DEATH_1", "LENGTH_1" };
-		String[] regionAttributes = { "REGION", "SQKM" };
+		String[] roadLinksAttributes = { "ID", "FR", "TO", "SPEED_1", "SPOP", "COST", "TLEVEL_1", "DEATH_1", "LENGTH_1" };
 
 		migrationSim.world_height = 500; // TODO - set correct size
 		migrationSim.world_width = 500; // TODO - set correct size
 
-		migrationSim.roadNetwork = new Network();
-		migrationSim.allRoadNodes = new SparseGrid2D(sim.world_width, sim.world_height);
-		migrationSim.roadLinks = new GeomVectorField(sim.world_width, sim.world_height);
-		Bag roadAtt = new Bag(roadAttributes);
-
 		migrationSim.regions = new GeomVectorField(sim.world_width, sim.world_height);
 		Bag regionAtt = new Bag(regionAttributes);
+		
+		migrationSim.countries = new GeomVectorField(sim.world_width, sim.world_height);
+		Bag countryAtt = new Bag(countryAttributes);
+		
+		migrationSim.roads = new GeomVectorField(sim.world_width, sim.world_height);
+		Bag roadAtt = new Bag(roadAttributes);
 
 		migrationSim.cityPoints = new GeomVectorField(sim.world_width, sim.world_height);
 		Bag cityAtt = new Bag(cityAttributes);
-
 		migrationSim.cityGrid = new SparseGrid2D(sim.world_width, sim.world_height);
 
-		String[] files = { Parameters.REGION_SHP, Parameters.ROAD_SHP, Parameters.CITY_SHP };// shapefiles
-		Bag[] attfiles = { regionAtt, roadAtt, cityAtt };
-		GeomVectorField[] vectorFields = { migrationSim.regions, migrationSim.roadLinks, migrationSim.cityPoints };
+		migrationSim.roadNetwork = new Network();
+		migrationSim.allRoadNodes = new SparseGrid2D(sim.world_width, sim.world_height);
+		migrationSim.roadLinks = new GeomVectorField(sim.world_width, sim.world_height);
+		Bag roadLinksAtt = new Bag(roadLinksAttributes);
+		
+		String[] files = { Parameters.REGION_SHP, Parameters.COUNTRY_SHP,Parameters.ROAD_SHP, Parameters.CITY_SHP, Parameters.ROADLINK_SHP };// shapefiles
+		Bag[] attfiles = { regionAtt, countryAtt, roadAtt, cityAtt, roadLinksAtt };
+		GeomVectorField[] vectorFields = { migrationSim.regions, migrationSim.countries,migrationSim.roads,migrationSim.cityPoints,migrationSim.roadLinks};
 		readInShapefile(files, attfiles, vectorFields);// read in attributes
 
 		// expand the extent to include all features
@@ -80,6 +88,8 @@ class MigrationBuilder {
 		MBR.expandToInclude(migrationSim.cityPoints.getMBR());
 
 		migrationSim.regions.setMBR(MBR);
+		migrationSim.countries.setMBR(MBR);
+		migrationSim.roads.setMBR(MBR);
 		migrationSim.roadLinks.setMBR(MBR);
 		migrationSim.cityPoints.setMBR(MBR);
 
@@ -326,7 +336,7 @@ class MigrationBuilder {
 
 	private static double pick_fin_status() {
 		// TODO Auto-generated method stub
-		return 3000;
+		return 10000;
 	}
 
 	private static int pickFamilySize() {
@@ -347,11 +357,12 @@ class MigrationBuilder {
 			int to = gm.getIntegerAttribute("TO");
 			double speed = gm.getDoubleAttribute("SPEED_1");
 			double distance = gm.getDoubleAttribute("LENGTH_1");
+			double spop = gm.getDoubleAttribute("SPOP");
 			double cost = gm.getDoubleAttribute("COST");
 			double transportlevel = gm.getDoubleAttribute("TLEVEL_1");
 			double deaths = gm.getDoubleAttribute("DEATH_1");
 
-			RoadInfo edgeinfo = new RoadInfo(gm.geometry, from, to, speed, distance, cost, transportlevel, deaths);
+			RoadInfo edgeinfo = new RoadInfo(gm.geometry, from, to, speed, spop, distance, cost, transportlevel, deaths);
 
 			// build road network
 			migrationSim.roadNetwork.addEdge(migrationSim.cityList.get(from), migrationSim.cityList.get(to), edgeinfo);

@@ -80,8 +80,8 @@ class RefugeeFamily implements Steppable {
 			goal = goalCity;
 			isMoving = false;
 		}
-		else if (finStatus == 0.0) {
-			System.out.println("poor");
+		else if (finStatus <= 0.0) {
+			System.out.println("----NO MONEY LEFT-----");
 			return;}
 		else if (isMoving == false)
 			return;
