@@ -121,9 +121,9 @@ public class AStar {
 					nextCity.cameFrom = x;
 					nextCity.gx = tentativeCost;
 					//System.out.println("hx: " + nextCity.hx);
-					//nextCity.fx = nextCity.gx + nextCity.hx;
-					// System.out.println("gx: " +
-					// nextCity.gx + "fx: " + nextCity.fx);
+					nextCity.fx = nextCity.gx + nextCity.hx;
+					 //System.out.println("gx: " +
+					 //nextCity.gx + "fx: " + nextCity.fx);
 				}
 			}
 
