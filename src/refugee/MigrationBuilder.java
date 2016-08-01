@@ -41,6 +41,7 @@ class MigrationBuilder {
 			Parameters.FAMILY_SIZE_SD);
 	private static HashMap<Integer, ArrayList<Double>> age_dist;
 	private static HashMap<Integer, Double> pop_dist;
+	private static HashMap<Integer, NormalDistribution> fin_dist;
 
 	// initialize world
 	public static void initializeWorld(Migration sim) {
@@ -49,6 +50,7 @@ class MigrationBuilder {
 		
 		age_dist = new HashMap<Integer, ArrayList<Double>>();
 		pop_dist = new HashMap<Integer, Double>();
+		fin_dist = new HashMap<Integer, NormalDistribution>();
 
 		String[] regionAttributes = { "REGION"};
 		String[] countryAttributes = { "COUNTRY"};
@@ -97,6 +99,7 @@ class MigrationBuilder {
 		extractFromRoadLinks(migrationSim.roadLinks, migrationSim);
 		setUpAgeDist(Parameters.AGE_DIST);
 		setUpPopDist(Parameters.POP_DIST);
+		setUpFinDist(Parameters.FIN_DIST);
 
 		// add refugees
 		addRefugees();
@@ -223,7 +226,8 @@ class MigrationBuilder {
 
 		// generate family
 		int familySize = pickFamilySize();
-		double finStatus = pick_fin_status();
+		double finStatus = pick_fin_status(fin_dist, city.getID()) * familySize;
+		//System.out.println(finStatus);
 		RefugeeFamily refugeeFamily = new RefugeeFamily(city.getLocation(), familySize, city, finStatus);
 		for (int i = 0; i < familySize; i++) {
 
@@ -297,6 +301,31 @@ class MigrationBuilder {
 		}
 	}
 	
+	private static void setUpFinDist(String fin_dist_file) {
+		try {
+			// buffer reader for age distribution data
+			CSVReader csvReader = new CSVReader(new FileReader(new File(fin_dist_file)));
+			//csvReader.readLine();// skip the headers
+			List<String> line = csvReader.readLine();
+			while (!line.isEmpty()) {
+				// read in the county ids
+				int city_id = NumberFormat.getNumberInstance(java.util.Locale.US).parse(line.get(0)).intValue();
+				// relevant info is from 5 - 21
+				double avgfin = Double.parseDouble(line.get(2));
+				double sd = Double.parseDouble(line.get(3));
+				fin_dist.put(city_id, new NormalDistribution(avgfin, sd));
+				line = csvReader.readLine();
+			}
+			System.out.println("fin");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (java.text.ParseException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	private static void setUpAgeDist(String age_dist_file) {
 		try {
 			// buffer reader for age distribution data
@@ -334,9 +363,11 @@ class MigrationBuilder {
 	
 
 
-	private static double pick_fin_status() {
+	private static double pick_fin_status(HashMap<Integer, NormalDistribution> fin_dist, int cityid) {
 		// TODO Auto-generated method stub
-		return 10000;
+		NormalDistribution nd = fin_dist.get(cityid);
+		return nd.sample();
+		
 	}
 
 	private static int pickFamilySize() {

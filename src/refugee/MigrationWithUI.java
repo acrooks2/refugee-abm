@@ -193,7 +193,7 @@ public class MigrationWithUI extends GUIState {
 
      JFreeChart chart1 = new JFreeChart(plot);
      ChartFrame timeframe = new ChartFrame("Time Chart", chart1);
-     timeframe.setVisible(true);
+     timeframe.setVisible(false);
      timeframe.setSize(200, 100);
      //timeframe.pack();
      c.registerFrame(timeframe);

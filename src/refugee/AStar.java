@@ -99,7 +99,7 @@ public class AStar {
 						+ edge.getScaledCost() * Parameters.COST_WEIGHT
 						+ edge.getTransportLevel() * Parameters.TRANSPORT_LEVEL_WEIGHT
 						+ edge.getDeaths() * Parameters.RISK_WEIGHT * refugee.dangerCare();
-
+				//System.out.println("gx: " + x.gx + " edgeweight: " + edgeweight);
 				double tentativeCost = x.gx + edgeweight; // changed from
 															// integer, still
 															// need to change
@@ -120,9 +120,10 @@ public class AStar {
 				if (better) {
 					nextCity.cameFrom = x;
 					nextCity.gx = tentativeCost;
-					nextCity.fx = nextCity.gx + nextCity.hx;
-					 //System.out.println("fx: " + nextCity.fx + "gx: " +
-					 //nextCity.gx);
+					//System.out.println("hx: " + nextCity.hx);
+					//nextCity.fx = nextCity.gx + nextCity.hx;
+					// System.out.println("gx: " +
+					// nextCity.gx + "fx: " + nextCity.fx);
 				}
 			}
 

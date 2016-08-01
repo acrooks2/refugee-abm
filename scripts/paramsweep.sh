@@ -19,8 +19,8 @@ TRIAL_STEPS=5
  
 #echo "s/$PARAM1 = 0.0000/$PARAM1 = $PARAM1_START/g"
 #set param file to initial vaules
-sed -i "s/$PARAM1 = 0.0000/$PARAM1 = $PARAM1_START/g" ~/assip/ebola-abm/src/Parameters.java
-sed -i "s/$PARAM2 = 0.00/$PARAM2 = $PARAM2_START/g" ~/assip/ebola-abm/src/Parameters.java
+sed -i "s/$PARAM1 = 0.0000/$PARAM1 = $PARAM1_START/g" ~/refugee-abm/src/Parameters.java
+sed -i "s/$PARAM2 = 0.00/$PARAM2 = $PARAM2_START/g" ~/refugee-abm/src/Parameters.java
  
  
 for m in $(seq 1 1 $TRIALS)

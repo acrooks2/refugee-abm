@@ -167,7 +167,7 @@ class Migration extends SimState {
 			}
 		}
 		String output_path = "output/";
-		String file_name = "output1";
+		String file_name = "output2";
 		File output = new File(output_path + file_name);
 		simState.writeToCSV(output_path, file_name);
 		
@@ -197,20 +197,27 @@ class Migration extends SimState {
                 writer.print(city.getName() + ",");
             }
             writer.println();
-            for(Object c: cities)
+            /*for(Object c: cities)
             {
             	City city = (City) c;
-                writer.print(city.getDepartures() + ",");
+                writer.print(city.getArrivals() + ",");
             }
             writer.println();
             for(Object c: cities)
             {
             	City city = (City) c;
-                writer.print(city.getArrivals() + ",");
+                writer.print(city.getDepartures() + ",");
             }
-            
-            
-
+            writer.println();*/
+            for (Object c: cities){
+            	City city = (City) c;
+                writer.print(Math.min(city.getDepartures(), city.getArrivals()) + ",");
+            }
+            writer.println();
+            for (Object c: cities){
+            	City city = (City)c;
+            	writer.print(Math.abs(city.getDepartures()-city.getArrivals()) + ",");
+            }
             writer.close();
         }
         catch(IOException e)

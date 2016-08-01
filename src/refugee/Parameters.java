@@ -4,8 +4,8 @@ class Parameters {
 
 	public static double TEMPORAL_RESOLUTION = 0.2;// steps per hour
 	//public static int NUM_ORIG_REFUGEES = 1;
-	public static int NUM_ORIG_PLACES = 7;
-	public static int TOTAL_POP = 100;
+	//public static int NUM_ORIG_PLACES = 7;
+	public static int TOTAL_POP = 1000;
 	// ----Refugee Characteristic Weights----//
 	public static double AVG_FAMILY_SIZE = 6.3; // http://www.acted.org/en/food-security-situation-and-livelihood-intervention-opportunities-syrians-refugees-and-host-communit
 	public static double FAMILY_SIZE_SD = 2.92; // same as above
@@ -17,16 +17,17 @@ class Parameters {
 	//-------Agent Decision Weights----//
 	public static double GOAL_CHANGE_PROB = 0.1;
 	// -------Edge Weights-------//
-	public static double ROAD_DEATH_WEIGHT = 0.1;
 	public static double MAX_EDGE_LENGTH = 1337284.917613;
 	public static double MIN_EDGE_LENGTH = 81947.33824;
 	public static double MIN_EDGE_COST = 0.0;
 	public static double MAX_EDGE_COST = 3375;
-	public static double COST_WEIGHT = 2.0;
-	public static double RISK_WEIGHT = 1.5;
+	public static double ROAD_DEATH_PROB = 0.1;
+	
+	public static double COST_WEIGHT = 1.0;
+	public static double RISK_WEIGHT = 1.0;
 	public static double DISTANCE_WEIGHT = 1.0;
 	public static double SPEED_WEIGHT = 1.0;
-	public static double POP_WEIGHT = 200.0;
+	public static double POP_WEIGHT = 10.0;
 	public static double TRANSPORT_LEVEL_WEIGHT = 0.5;
 	public static double HEU_WEIGHT = 0.00000001;
 
@@ -51,6 +52,7 @@ class Parameters {
 	public static String ROADLINK_SHP = "data/shapefiles/routes5.shp";// shapefile 
 	public static String AGE_DIST = "data/csvs/age_dist2.csv";// have
 	public static String POP_DIST = "data/csvs/pop_dist.csv";
+	public static String FIN_DIST = "data/csvs/fin_dist.csv";
 	// Edge attributes
 
 

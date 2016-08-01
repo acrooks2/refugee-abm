@@ -150,7 +150,7 @@ class RefugeeFamily implements Steppable {
 				if (this.location.getX() == city.getLocation().getX() && this.location.getY() == city.getLocation().getY()){
 					currentCity = city;
 					RoadInfo einfo = (RoadInfo) this.currentEdge.getInfo();
-					this.finStatus -= einfo.getCost();//if at the end of an edge, subtract the money
+					this.finStatus -= (einfo.getCost()*this.familyMembers.size());//if at the end of an edge, subtract the money
 					//city.addMembers(this.familyMembers);
 					for (Object or: this.familyMembers){
 						Refugee rr = (Refugee)or;
@@ -252,7 +252,7 @@ class RefugeeFamily implements Steppable {
 	}
 	
 	public static void determineDeath(RoadInfo edge, RefugeeFamily refugee){
-		double deaths = edge.getDeaths() * Parameters.ROAD_DEATH_WEIGHT;
+		double deaths = edge.getDeaths() * Parameters.ROAD_DEATH_PROB;
 		double rand= random.nextDouble();
 		if (rand < deaths){//first family member dies (for now)
 			if (refugee.getFamily().size() != 0){
