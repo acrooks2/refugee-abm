@@ -64,7 +64,7 @@ public class MigrationWithUI extends GUIState {
 		display.attach(regionPortrayal, "Regions");
 		display.attach(countryPortrayal, "Counties (area)");
 		display.attach(countryBndPortrayal, "Countries (boundary)");
-		//display.attach(roadPortrayal, "Roads");
+		display.attach(roadPortrayal, "Roads");
 		display.attach(cityPortrayal, "Cities");
 		display.attach(roadLinkPortrayal, "Routes");
 		display.attach(refugeePortrayal, "Refugees");
@@ -224,7 +224,7 @@ public class MigrationWithUI extends GUIState {
 		
 		// Adding the road portrayal
 		roadPortrayal.setField(((Migration) state).roads);
-		roadPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(255, 199, 199), 1, false));
+		roadPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(0, 128, 128), 1, true));
 		
 		// Adding the region portrayal
 		regionPortrayal.setField(((Migration) state).regions);

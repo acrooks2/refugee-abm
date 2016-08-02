@@ -167,7 +167,7 @@ class Migration extends SimState {
 			}
 		}
 		String output_path = "output/";
-		String file_name = "output2";
+		String file_name = "output3";
 		File output = new File(output_path + file_name);
 		simState.writeToCSV(output_path, file_name);
 		

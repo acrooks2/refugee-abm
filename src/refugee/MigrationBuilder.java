@@ -194,7 +194,7 @@ class MigrationBuilder {
 				int currentPop = 0;// 1,4,5,10,3,14,24
 				int citypop = (int)Math.round(pop_dist.get(city.getID()) * Parameters.TOTAL_POP);
 				System.out.println(city.getName() + ": " + citypop);
-				while (currentPop <= citypop) { 
+				while (currentPop < citypop) { 
 					RefugeeFamily r = createRefugeeFamily(city, currentPop);
 					System.out.println(r.getFamily().size());
 					migrationSim.refugeeFamilies.add(r);
