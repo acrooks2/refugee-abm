@@ -395,7 +395,7 @@ class MigrationBuilder {
 			double cost = gm.getDoubleAttribute("COST");
 			double transportlevel = gm.getDoubleAttribute("TLEVEL_1");
 			double deaths = gm.getDoubleAttribute("DEATH_1");
-			System.out.println("pop weight: " + spop);
+			//System.out.println("pop weight: " + spop);
 			RoadInfo edgeinfo = new RoadInfo(gm.geometry, from, to, speed, spop, distance, cost, transportlevel, deaths);
 
 			// build road network
