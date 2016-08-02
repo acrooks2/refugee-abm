@@ -195,7 +195,7 @@ class MigrationBuilder {
 				int citypop = (int)Math.round(pop_dist.get(city.getID()) * Parameters.TOTAL_POP);
 				System.out.println(city.getName() + ": " + citypop);
 				while (currentPop <= citypop) { 
-					RefugeeFamily r = createRefugeeFamily(city);
+					RefugeeFamily r = createRefugeeFamily(city, currentPop);
 					System.out.println(r.getFamily().size());
 					migrationSim.refugeeFamilies.add(r);
 					for (Object o: r.getFamily()){
@@ -222,10 +222,13 @@ class MigrationBuilder {
 		}
 	}
 
-	private static RefugeeFamily createRefugeeFamily(City city) {
-
+	private static RefugeeFamily createRefugeeFamily(City city, int currentpop) {
+		int citypop = (int)Math.round(pop_dist.get(city.getID()) * Parameters.TOTAL_POP);
 		// generate family
 		int familySize = pickFamilySize();
+		if (familySize + currentpop > citypop){
+			familySize = citypop - currentpop;
+		}
 		double finStatus = pick_fin_status(fin_dist, city.getID()) * familySize;
 		//System.out.println(finStatus);
 		RefugeeFamily refugeeFamily = new RefugeeFamily(city.getLocation(), familySize, city, finStatus);
@@ -388,7 +391,7 @@ class MigrationBuilder {
 			int to = gm.getIntegerAttribute("TO");
 			double speed = gm.getDoubleAttribute("SPEED_1");
 			double distance = gm.getDoubleAttribute("LENGTH_1");
-			double spop = 1 - gm.getDoubleAttribute("SPOP");
+			double spop = gm.getDoubleAttribute("SPOP");
 			double cost = gm.getDoubleAttribute("COST");
 			double transportlevel = gm.getDoubleAttribute("TLEVEL_1");
 			double deaths = gm.getDoubleAttribute("DEATH_1");
