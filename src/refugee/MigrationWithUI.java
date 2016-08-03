@@ -1,3 +1,4 @@
+
 package refugee;
 
 import org.jfree.chart.ChartFactory;
@@ -59,12 +60,12 @@ public class MigrationWithUI extends GUIState {
 
 		display = new Display2D(600, 520, this); // creates the display
 		// display.setRefresRate(32);
-		display.setScale(1.2);
+		display.setScale(1.5);
 
 		display.attach(regionPortrayal, "Regions");
 		display.attach(countryPortrayal, "Counties (area)");
 		display.attach(countryBndPortrayal, "Countries (boundary)");
-		display.attach(roadPortrayal, "Roads");
+		//display.attach(roadPortrayal, "Roads");
 		display.attach(cityPortrayal, "Cities");
 		display.attach(roadLinkPortrayal, "Routes");
 		display.attach(refugeePortrayal, "Refugees");
@@ -73,7 +74,7 @@ public class MigrationWithUI extends GUIState {
 		c.registerFrame(displayFrame);
 		displayFrame.setVisible(true);
 		displayFrame.setSize(800, 520);
-		display.setBackdrop(new Color(65,141,199));
+		display.setBackdrop(new Color(179,236,255));
 		
 		//deaths chart
 	    Dimension dm = new Dimension(360,120);
@@ -85,7 +86,7 @@ public class MigrationWithUI extends GUIState {
         healthStatus.setSize(dm);
         
         healthStatus.setTitle("Health Status");
-        healthStatus.setRangeAxisLabel("Number of People");
+        healthStatus.setRangeAxisLabel("Percentage of Agents");
         healthStatus.setDomainAxisLabel("Hours");
         healthStatus.setMaximumSize(dm);
         healthStatus.setMinimumSize(dmn);
@@ -220,11 +221,11 @@ public class MigrationWithUI extends GUIState {
 
 		// Adding the roadlinks portrayal
 		roadLinkPortrayal.setField(((Migration) state).roadLinks);
-		roadLinkPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(0,102,51), 1, true));
+		roadLinkPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(255,77,166), 1, true));
 		
 		// Adding the road portrayal
 		roadPortrayal.setField(((Migration) state).roads);
-		roadPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(0, 128, 128), 1, true));
+		roadPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(255, 199, 199), 1, false));
 		
 		// Adding the region portrayal
 		regionPortrayal.setField(((Migration) state).regions);
@@ -232,7 +233,7 @@ public class MigrationWithUI extends GUIState {
 		
 		// Adding the country portrayal
 		countryPortrayal.setField(((Migration) state).countries);
-		countryPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(249, 208, 138), 1, true));
+		countryPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(226,198,141), 1, true));
 		countryBndPortrayal.setField(((Migration) state).countries);
 		countryBndPortrayal.setPortrayalForAll(new GeomPortrayal(new Color(64,64,64), 1, false));		
 
@@ -267,19 +268,31 @@ public class MigrationWithUI extends GUIState {
 	                Rectangle2D.Double draw = info.draw;
 	                int refugee_pop = city.getRefugeePopulation();
 	              //  System.out.println("refugee_pop = " + refugee_pop);
+	                paint = new Color(122, 56, 255);
 	                Double scale = 1.0;
-	                if(refugee_pop == 0)
+	                if(refugee_pop == 0) {
 	                	scale = 5.0;
-	                else if(refugee_pop > 0 && refugee_pop <= Parameters.TOTAL_POP * 0.3)
+	              //  	paint = new Color(51, 102, 255);
+	                }
+	                else if(refugee_pop > 0 && refugee_pop <= Parameters.TOTAL_POP * 0.3) {
 	                	scale = 15.0;
-	                else if(refugee_pop > Parameters.TOTAL_POP * 0.3 && refugee_pop <= Parameters.TOTAL_POP*0.6)
+	                	//paint = new Color(112, 77, 255);
+	              //  	paint = new Color(163, 177, 255);
+	                }
+	                else if(refugee_pop > Parameters.TOTAL_POP * 0.3 && refugee_pop <= Parameters.TOTAL_POP*0.6){
 	                	scale = 25.0;
-	                else if(refugee_pop > Parameters.TOTAL_POP*0.6)
+	                	//paint = new Color(133, 102, 255);
+	             //   	paint = new Color(177, 138, 255);
+	                }
+	                else if(refugee_pop > Parameters.TOTAL_POP*0.6){
 	                	scale = 40.0;
+	                	//paint = new Color(235, 138, 255);
+	              //  	paint = new Color(177, 138, 255);
+	                }
 	                
 	                //paint = new Color(0, 128, 255);
 	                //paint = new Color(255, 154, 146);
-	                paint = new Color(255, 137, 95);
+	                //paint = new Color(255, 137, 95);
 	                final double width = draw.width*scale + offset;
 	                final double height = draw.height*scale + offset;
 
@@ -318,7 +331,7 @@ public class MigrationWithUI extends GUIState {
 		});
 
 		display.reset();
-		display.setBackdrop(new Color(65,141,199));
+		display.setBackdrop(new Color(179,236,255));
 		display.repaint();
 	}
 

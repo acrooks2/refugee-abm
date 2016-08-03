@@ -54,10 +54,8 @@ public class AStar {
 		openSetQueue.add(startCity);
 		while (openSet.size() > 0) { // while there are reachable allRoadCities
 										// to investigate
-			AStarCityWrapper x = findMin(openSet);
-			//AStarCityWrapper x = openSetQueue.peek();
-			//System.out.println();
-			//System.out.println("Peek: "+ x.city.getName());
+
+			AStarCityWrapper x = openSetQueue.peek();
 			if (x == null) {
 				AStarCityWrapper n = findMin(openSet);
 			}
@@ -79,7 +77,7 @@ public class AStar {
 				City n = (City) e.from();
  				if (n == x.city)
 					n = (City) e.to();
- 				
+
 				// get the A* meta information about this City
 				AStarCityWrapper nextCity;
 				if (foundCities.containsKey(n))
@@ -88,10 +86,7 @@ public class AStar {
 					nextCity = new AStarCityWrapper(n);
 					foundCities.put(n, nextCity);
 				}
-				//System.out.println(x.city.getName());
-				//System.out.println(nextCity.city.getName());
 
-				
 				if (closedSet.contains(nextCity)) // it has already been
 													// considered
 					continue;
@@ -100,11 +95,11 @@ public class AStar {
 				RoadInfo edge = (RoadInfo) e.getInfo();
 				// System.out.println(edge.getWeightedDistance());
 				double edgeweight = edge.getWeightedDistance() * Parameters.DISTANCE_WEIGHT
-						+ edge.getSpeed() * Parameters.SPEED_WEIGHT - edge.getScaledPopulation() * Parameters.POP_WEIGHT
+						+ edge.getSpeed() * Parameters.SPEED_WEIGHT + edge.getScaledPopulation() * Parameters.POP_WEIGHT
 						+ edge.getScaledCost() * Parameters.COST_WEIGHT
 						+ edge.getTransportLevel() * Parameters.TRANSPORT_LEVEL_WEIGHT
 						+ edge.getDeaths() * Parameters.RISK_WEIGHT * refugee.dangerCare();
-
+				//System.out.println("gx: " + x.gx + " edgeweight: " + edgeweight);
 				double tentativeCost = x.gx + edgeweight; // changed from
 															// integer, still
 															// need to change
@@ -115,24 +110,18 @@ public class AStar {
 				if (!openSet.contains(nextCity)) {
 					openSet.add(nextCity);
 					openSetQueue.add(nextCity);
-					//System.out.println("ORIGINAL gx: " + nextCity.gx + " hx: " + nextCity.hx + " fx: " + nextCity.fx);
 					nextCity.hx = heuristic(n, goal);
-
 					better = true;
 				} else if (tentativeCost < nextCity.gx) {
 					better = true;
 				}
-				//System.out.println(better);
+
 				// store A* information about this promising candidate City
 				if (better) {
 					nextCity.cameFrom = x;
 					nextCity.gx = tentativeCost;
-					//System.out.println("From: " + x.city.getName() + " To: " + nextCity.city.getName());
-					//System.out.println(edge.getScaledPopulation() * Parameters.POP_WEIGHT);
-					//System.out.println("gx: " + x.gx + " edgeweight: " + edgeweight);
 					//System.out.println("hx: " + nextCity.hx);
 					nextCity.fx = nextCity.gx + nextCity.hx;
-					//System.out.println("fx: " + nextCity.fx);
 					 //System.out.println("gx: " +
 					 //nextCity.gx + "fx: " + nextCity.fx);
 				}

@@ -42,12 +42,6 @@ class RoadInfo {
 	 * public Int2D getLocation(int index) { Int2D location = path.get(index);
 	 * return location; }
 	 */
-	public int getFrom(){
-		return from;
-	}
-	public int getTo(){
-		return to;
-	}
 	public void addPeople(int n) {
 		this.population += n;
 	}

@@ -1,27 +1,15 @@
 package refugee;
-
-import ec.util.MersenneTwisterFast;
-import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultValueDataset;
-import org.jfree.data.xy.XYDataItem;
 import org.jfree.data.xy.XYSeries;
-import sim.engine.MakesSimState;
 import sim.engine.Schedule;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.field.continuous.Continuous2D;
 import sim.field.geo.GeomVectorField;
-import sim.field.grid.DoubleGrid2D;
-import sim.field.grid.IntGrid2D;
 import sim.field.grid.SparseGrid2D;
 import sim.field.network.Network;
 import sim.util.Bag;
-import sim.util.Double2D;
-import sim.util.Int2D;
-import sim.util.distribution.Poisson;
-
 import java.io.*;
-import java.text.NumberFormat;
 import java.util.*;
 
 class Migration extends SimState {
@@ -34,7 +22,7 @@ class Migration extends SimState {
 	public GeomVectorField regions;
 	public GeomVectorField countries;
 	public GeomVectorField roads;
-	public GeomVectorField roadLinks;   //roadLinks;
+	public GeomVectorField roadLinks; // roadLinks;
 	public GeomVectorField cityPoints;
 
 	public GeomVectorField adminBoundaries;// TODO may not be needed
@@ -61,14 +49,18 @@ class Migration extends SimState {
 
 	// public Map<Integer, List<MovementPattern>> movementPatternMap = new
 	// HashMap<>();
-	
-    public XYSeries totalDeadSeries = new XYSeries(" Dead"); // shows number of recovered agents
-    public XYSeries finSeries = new XYSeries("Finance"); // shows number of recovered agents
-    
-    // timer graphics
-    DefaultValueDataset hourDialer = new DefaultValueDataset(); // shows the current hour
-    DefaultValueDataset dayDialer = new DefaultValueDataset(); // counts
-    
+
+	public XYSeries totalDeadSeries = new XYSeries(" Dead"); // shows number of
+																// recovered
+																// agents
+	public XYSeries finSeries = new XYSeries("Finance"); // shows number of
+															// recovered agents
+
+	// timer graphics
+	DefaultValueDataset hourDialer = new DefaultValueDataset(); // shows the
+																// current hour
+	DefaultValueDataset dayDialer = new DefaultValueDataset(); // counts
+
 	public Migration(long seed) {
 		super(seed);
 	}
@@ -80,48 +72,48 @@ class Migration extends SimState {
 		refugeeFamilies = new Bag();
 		MigrationBuilder.initializeWorld(this);
 
-
 		// charts
 
 		Steppable chartUpdater = new Steppable() {
 			@Override
 			public void step(SimState simState) {
-			//	System.out.println("\n");
+				// System.out.println("\n");
 				total_dead = 0;
 				double total_fin = 0;
 				long cStep = simState.schedule.getSteps();
-				if (cStep/24 > 420){
+				if (cStep / 24 > 420) {
 					simState.finish();
 				}
-				
-                double day = cStep*Parameters.TEMPORAL_RESOLUTION/24;
-                double hour = cStep*Parameters.TEMPORAL_RESOLUTION%24;
-                hourDialer.setValue(hour);
-                dayDialer.setValue(day);
-                
-				   Bag allRefugees = world.getAllObjects();
-				   for (Object o: allRefugees){
-					   //RefugeeFamily family = (RefugeeFamily) o;
-						   Refugee r = (Refugee)o;
-					   
-					  // for (Refugee r: family.getFamily()){
-						   if (r.getHealthStatus() == Constants.DEAD)
-							   total_dead++;
-						   }
-					   //}
-				   for (Object o: refugeeFamilies){
-					   
-					   RefugeeFamily family = (RefugeeFamily)o;
-					   total_fin += family.getFinStatus();
-				   }
-				  // total_pop = allRefugees.size();
-				 //  double display_deaths = total_dead/total_pop;
-				   //totalDeadSeries.add(cStep*Parameters.TEMPORAL_RESOLUTION, display_deaths);
-				   double percentage_dead = total_dead * 1.0/Parameters.TOTAL_POP;
-				   totalDeadSeries.add(cStep*Parameters.TEMPORAL_RESOLUTION, percentage_dead);
-				   
-				   double avg_fin = total_fin * 1.0/Parameters.TOTAL_POP;
-				   finSeries.add(cStep*Parameters.TEMPORAL_RESOLUTION, avg_fin);
+
+				double day = cStep * Parameters.TEMPORAL_RESOLUTION / 24;
+				double hour = cStep * Parameters.TEMPORAL_RESOLUTION % 24;
+				hourDialer.setValue(hour);
+				dayDialer.setValue(day);
+
+				Bag allRefugees = world.getAllObjects();
+				for (Object o : allRefugees) {
+					// RefugeeFamily family = (RefugeeFamily) o;
+					Refugee r = (Refugee) o;
+
+					// for (Refugee r: family.getFamily()){
+					if (r.getHealthStatus() == Constants.DEAD)
+						total_dead++;
+				}
+				// }
+				for (Object o : refugeeFamilies) {
+
+					RefugeeFamily family = (RefugeeFamily) o;
+					total_fin += family.getFinStatus();
+				}
+				// total_pop = allRefugees.size();
+				// double display_deaths = total_dead/total_pop;
+				// totalDeadSeries.add(cStep*Parameters.TEMPORAL_RESOLUTION,
+				// display_deaths);
+				double percentage_dead = total_dead * 1.0 / Parameters.TOTAL_POP;
+				totalDeadSeries.add(cStep * Parameters.TEMPORAL_RESOLUTION, percentage_dead);
+
+				double avg_fin = total_fin * 1.0 / Parameters.TOTAL_POP;
+				finSeries.add(cStep * Parameters.TEMPORAL_RESOLUTION, avg_fin);
 			}
 		};
 		this.schedule.scheduleRepeating(chartUpdater);
@@ -153,7 +145,21 @@ class Migration extends SimState {
 
 	public static void main(String[] args) {
 
-		// doLoop(Landscape.class, args);
+		String output_path = "output/";
+		String file_name = "output";
+
+		if (args.length > 1) { // run parameter sweep
+			Parameters.TRIALNO = Integer.parseInt(args[0]);
+			Parameters.COST_WEIGHT = Double.parseDouble(args[1]);
+			Parameters.RISK_WEIGHT = Double.parseDouble(args[2]);
+			Parameters.DISTANCE_WEIGHT = Double.parseDouble(args[3]);
+			Parameters.SPEED_WEIGHT = Double.parseDouble(args[4]);
+			Parameters.POP_WEIGHT = Double.parseDouble(args[5]);
+			Parameters.HEU_WEIGHT = Double.parseDouble(args[6]);
+			Parameters.TOTAL_POP = Integer.parseInt(args[7]);
+			// file_name = "output_all";
+		}
+
 		long seed = System.currentTimeMillis();
 		Migration simState = new Migration(seed);
 		long io_start = System.currentTimeMillis();
@@ -166,11 +172,9 @@ class Migration extends SimState {
 				break;
 			}
 		}
-		String output_path = "output/";
-		String file_name = "outputSame";
+
 		File output = new File(output_path + file_name);
-		simState.writeToCSV(output_path, file_name);
-		
+		simState.writeToCSV("" + Parameters.TRIALNO, output_path, file_name);
 
 		// create our run directory
 
@@ -184,46 +188,84 @@ class Migration extends SimState {
 		System.exit(0);
 
 	}
-	
-    public void writeToCSV(String output_path, String file_name)
-    {
-        try
-        {
-            PrintWriter writer = new PrintWriter(output_path + file_name);
-            //edit to do columns
-            for(Object c: cities)
-            {
-            	City city = (City) c;
-                writer.print(city.getName() + ",");
-            }
-            writer.println();
-            /*for(Object c: cities)
-            {
-            	City city = (City) c;
-                writer.print(city.getArrivals() + ",");
-            }
-            writer.println();
-            for(Object c: cities)
-            {
-            	City city = (City) c;
-                writer.print(city.getDepartures() + ",");
-            }
-            writer.println();*/
-            for (Object c: cities){
-            	City city = (City) c;
-                writer.print(Math.min(city.getDepartures(), city.getArrivals()) + ",");
-            }
-            writer.println();
-            for (Object c: cities){
-            	City city = (City)c;
-            	writer.print(Math.abs(city.getDepartures()-city.getArrivals()) + ",");
-            }
-            writer.close();
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
+
+	public void writeToCSV(String trialNo, String output_path, String file_name) {
+		try {
+
+			File passfile = new File(output_path + file_name + "_pass.csv");
+			File stayfile = new File(output_path + file_name + "_stay.csv");
+			File paramfile = new File(output_path + file_name + "_parameter.csv");
+			boolean newout = false;
+			if (!passfile.exists()) {
+				passfile.createNewFile();
+				newout = true;
+			}
+			if (!stayfile.exists()) {
+				stayfile.createNewFile();
+				newout = true;
+			}
+			boolean newparam = false;
+			if (!paramfile.exists()) {
+				paramfile.createNewFile();
+				newparam = true;
+			}
+			FileWriter fw = new FileWriter(passfile, true);
+			BufferedWriter bw = new BufferedWriter(fw);
+			PrintWriter writer = new PrintWriter(bw);
+			FileWriter fw1 = new FileWriter(stayfile, true);
+			BufferedWriter bw1 = new BufferedWriter(fw1);
+			PrintWriter writer1 = new PrintWriter(bw1);
+			if (newout) {
+				writer.print("TRIALNO,");
+				writer1.print("TRIALNO,");
+				// edit to do columns
+				for (Object c : cities) {
+					City city = (City) c;
+					writer.print(city.getName() + ",");
+					writer1.print(city.getName() + ",");
+				}
+				writer.println();
+				writer1.println();
+			}
+			writer.print(trialNo + ",");
+			writer1.print(trialNo + ",");
+			for (Object c : cities) {
+				City city = (City) c;
+				writer.print(Math.min(city.getDepartures(), city.getArrivals()) + ",");
+			}
+			writer.println();
+			for (Object c : cities) {
+				City city = (City) c;
+				writer1.print(city.getArrivals() - city.getDepartures() + ",");
+			}
+			writer.close();
+			writer1.println();
+			writer1.close();
+
+			FileWriter fw2 = new FileWriter(paramfile, true);
+			BufferedWriter bw2 = new BufferedWriter(fw2);
+			PrintWriter writer2 = new PrintWriter(bw2);
+
+			if (newparam) {
+				String[] param = { "TRIALNO", "COST_WEIGHT", "RISK_WEIGHT", "DISTANCE_WEIGHT", "SPEED_WEIGHT",
+						"POP_WEIGHT", "HEU_WEIGHT", "TOTAL_POP" };
+				for (int i = 0; i < param.length; i++)
+					writer2.print(param[i] + ",");
+			}
+			writer2.println();
+			writer2.printf("%d,", Parameters.TRIALNO);
+			writer2.printf("%3.2f,", Parameters.COST_WEIGHT);
+			writer2.printf("%3.2f,", Parameters.RISK_WEIGHT);
+			writer2.printf("%3.2f,", Parameters.DISTANCE_WEIGHT);
+			writer2.printf("%3.2f,", Parameters.SPEED_WEIGHT);
+			writer2.printf("%3.2f,", Parameters.POP_WEIGHT);
+			writer2.printf("%3.8f,", Parameters.HEU_WEIGHT);
+			writer2.printf("%d,", Parameters.TOTAL_POP);
+			writer2.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
 
 }

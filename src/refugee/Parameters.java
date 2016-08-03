@@ -5,7 +5,8 @@ class Parameters {
 	public static double TEMPORAL_RESOLUTION = 0.4;// steps per hour
 	//public static int NUM_ORIG_REFUGEES = 1;
 	//public static int NUM_ORIG_PLACES = 7;
-	public static int TOTAL_POP = 100000;
+	public static int TRIALNO = 0;
+	public static int TOTAL_POP = 1000;
 	// ----Refugee Characteristic Weights----//
 	public static double AVG_FAMILY_SIZE = 6.3; // http://www.acted.org/en/food-security-situation-and-livelihood-intervention-opportunities-syrians-refugees-and-host-communit
 	public static double FAMILY_SIZE_SD = 2.92; // same as above
@@ -23,13 +24,13 @@ class Parameters {
 	public static double MAX_EDGE_COST = 3375;
 	public static double ROAD_DEATH_PROB = 0.1;
 	
-	public static double COST_WEIGHT = 0.1;
-	public static double RISK_WEIGHT = 0.1;
-	public static double DISTANCE_WEIGHT = 0.1;
-	public static double SPEED_WEIGHT = 0.1;
-	public static double POP_WEIGHT = 0.2;
-	public static double TRANSPORT_LEVEL_WEIGHT = 0.1;
-	public static double HEU_WEIGHT = 1/19348237.217718;
+	public static double COST_WEIGHT = 1.0;
+	public static double RISK_WEIGHT = 1.0;
+	public static double DISTANCE_WEIGHT = 1.0;
+	public static double SPEED_WEIGHT = 1.0;
+	public static double POP_WEIGHT = 1.0; //100
+	public static double TRANSPORT_LEVEL_WEIGHT = 0.5;
+	public static double HEU_WEIGHT = 0.00000005; //1/19348237.217718; //0.000001;
 
 	public static double POP_BLOCK_METERS = 926.1;// Height and width of one
 													// population block.
@@ -46,7 +47,7 @@ class Parameters {
 	// public static String AGE_DIST_PATH = "";//have, but only take columns
 	// that say TOT
 	public static String REGION_SHP = "data/shapefiles/region.shp";// shapefile
-	public static String COUNTRY_SHP = "data/shapefiles/country.shp";// shapefile
+	public static String COUNTRY_SHP = "data/shapefiles/country2.shp";// shapefile
 	public static String CITY_SHP = "data/shapefiles/city.shp";// have
 	public static String ROAD_SHP = "data/shapefiles/roads.shp";// shapefile 
 	public static String ROADLINK_SHP = "data/shapefiles/routes5.shp";// shapefile 
