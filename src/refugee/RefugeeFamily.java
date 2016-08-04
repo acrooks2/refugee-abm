@@ -222,7 +222,7 @@ class RefugeeFamily implements Steppable {
 		//if not continue with it and keep label as good
 		
 		//TODO **** can't return back to an old route unless goal has changed
-		for (Route r: cachedRoutes.keySet()){
+		/*for (Route r: cachedRoutes.keySet()){
 			if (r.equals(newRoute)){
 				System.out.println("---------FOUND SAME---------");
 				if (cachedRoutes.get(r) == 1 || goalChanged)
@@ -234,7 +234,13 @@ class RefugeeFamily implements Steppable {
 				cachedRoutes.put(r, 0);
 	}
 		cachedRoutes.put(newRoute, 1);
-		return newRoute;
+		return newRoute;*/
+		
+		
+		if (goalChanged)
+					return newRoute;
+				else
+					return this.route;
 	
 	}
 

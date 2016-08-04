@@ -15,7 +15,7 @@ public class Stats {
 		String actual_file = "parameter_sweeps/actual.csv";
 		readInActual(actual_file, actualpop);
 		
-		String compareFile = "parameter_sweeps/1/output_pass";
+		String compareFile = "parameter_sweeps/risk/output_arrive";
 		compareToFile(compareFile, actualpop);
 		
 	}
@@ -56,26 +56,34 @@ public class Stats {
 			BufferedWriter bw = new BufferedWriter(fw);
 			PrintWriter writer = new PrintWriter(bw);
 			List<String> names = csvReader.readLine(); 
+			names.remove(0);//header
 			List<String> values = csvReader.readLine();
-			System.out.println(values);
+
 			List<Double> newvalues;
 			
 			while (!values.isEmpty()){
-			newvalues = new ArrayList<Double>(values.size());
+			newvalues = new ArrayList<Double>(values.size() - 1);
 			//System.out.println("Size: " + newvalues.size());
 			int trialNumber = NumberFormat.getNumberInstance(java.util.Locale.US).parse(values.get(0)).intValue();
+			values.remove(0);
+			System.out.println(values);
+			System.out.println(values.size());
 			//double sum = 0;
-			for (int i = 1; i < values.size(); i++){
-				double value = NumberFormat.getNumberInstance(java.util.Locale.US).parse(values.get(i)).doubleValue();
+			for (int i = 0; i < values.size() - 1; i++){
+				
+				double value = (double) NumberFormat.getNumberInstance(java.util.Locale.US).parse(values.get(i)).intValue();
+				System.out.println(i + ": " + value);
 				//sum += value;
-				newvalues.add(i-1, value);
+				newvalues.add(i, value);
 			}
 			double min = Collections.min(newvalues);
 			double max = Collections.max(newvalues);
 			double difference = 0;
 			for (int i = 0; i < newvalues.size(); i++){
 				double percent = (newvalues.get(i) - min)/(max - min);
-				double actualPercent = actualpop.get(names.get(i-1));
+				double actualPercent = actualpop.get(names.get(i));
+				System.out.println(names.get(i));
+				System.out.println(actualPercent + ", " + percent);
 				difference += Math.abs(percent - actualPercent);
 			}
 			writer.println(trialNumber + "," + difference);

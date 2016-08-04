@@ -145,7 +145,7 @@ class Migration extends SimState {
 
 	public static void main(String[] args) {
 
-		String output_path = "output/";
+		String output_path = "parameter_sweeps/";
 		String file_name = "output";
 
 		if (args.length > 1) { // run parameter sweep
@@ -158,6 +158,16 @@ class Migration extends SimState {
 			Parameters.HEU_WEIGHT = Double.parseDouble(args[6]);
 			Parameters.TOTAL_POP = Integer.parseInt(args[7]);
 			// file_name = "output_all";
+		}
+		else{
+			Parameters.TRIALNO = 1;//Integer.parseInt(args[0]);
+			Parameters.COST_WEIGHT = 0.1;//Double.parseDouble(args[1]);
+			Parameters.RISK_WEIGHT = 0.1;//D/ouble.parseDouble(args[2]);
+			Parameters.DISTANCE_WEIGHT = 0.1;//Double.parseDouble(args[3]);
+			Parameters.SPEED_WEIGHT = 0.1;//Double.parseDouble(args[4]);
+			Parameters.POP_WEIGHT = 10.0;//Double.parseDouble(args[5]);
+			Parameters.HEU_WEIGHT = 0.1;//Double.parseDouble(args[6]);
+			Parameters.TOTAL_POP = 1000;//Integer.parseInt(args[7]);
 		}
 
 		long seed = System.currentTimeMillis();
@@ -192,15 +202,20 @@ class Migration extends SimState {
 	public void writeToCSV(String trialNo, String output_path, String file_name) {
 		try {
 
-			File passfile = new File(output_path + file_name + "_pass.csv");
-			File stayfile = new File(output_path + file_name + "_stay.csv");
-			File paramfile = new File(output_path + file_name + "_parameter.csv");
+			File passfile = new File(output_path + file_name + "_pass2.csv");
+			File stayfile = new File(output_path + file_name + "_stay2.csv");
+			File arrivefile = new File(output_path + file_name + "_arrive2.csv");
+			File paramfile = new File(output_path + file_name + "_parameter2.csv");
 			boolean newout = false;
 			if (!passfile.exists()) {
 				passfile.createNewFile();
 				newout = true;
 			}
 			if (!stayfile.exists()) {
+				stayfile.createNewFile();
+				newout = true;
+			}
+			if (!arrivefile.exists()) {
 				stayfile.createNewFile();
 				newout = true;
 			}
@@ -215,32 +230,46 @@ class Migration extends SimState {
 			FileWriter fw1 = new FileWriter(stayfile, true);
 			BufferedWriter bw1 = new BufferedWriter(fw1);
 			PrintWriter writer1 = new PrintWriter(bw1);
+			FileWriter fw3 = new FileWriter(arrivefile, true);
+			BufferedWriter bw3 = new BufferedWriter(fw3);
+			PrintWriter writer3 = new PrintWriter(bw3);
 			if (newout) {
 				writer.print("TRIALNO,");
 				writer1.print("TRIALNO,");
+				writer3.print("TRIALNO,");
 				// edit to do columns
 				for (Object c : cities) {
 					City city = (City) c;
 					writer.print(city.getName() + ",");
 					writer1.print(city.getName() + ",");
+					writer3.print(city.getName() + ",");
 				}
 				writer.println();
 				writer1.println();
+				writer3.println();
 			}
 			writer.print(trialNo + ",");
 			writer1.print(trialNo + ",");
+			writer3.print(trialNo + ",");
 			for (Object c : cities) {
 				City city = (City) c;
 				writer.print(Math.min(city.getDepartures(), city.getArrivals()) + ",");
 			}
-			writer.println();
+			//writer.println();
 			for (Object c : cities) {
 				City city = (City) c;
 				writer1.print(city.getArrivals() - city.getDepartures() + ",");
 			}
+			for (Object c : cities) {
+				City city = (City) c;
+				writer3.print(city.getArrivals() + ",");
+			}
+			writer.println();
 			writer.close();
 			writer1.println();
 			writer1.close();
+			writer3.println();
+			writer3.close();
 
 			FileWriter fw2 = new FileWriter(paramfile, true);
 			BufferedWriter bw2 = new BufferedWriter(fw2);

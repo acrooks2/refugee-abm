@@ -56,6 +56,8 @@ public class AStar {
 										// to investigate
 
 			AStarCityWrapper x = openSetQueue.peek();
+			//AStarCityWrapper x = findMin(openSet);
+			System.out.println("Peek: " + x.city.getName());
 			if (x == null) {
 				AStarCityWrapper n = findMin(openSet);
 			}
@@ -80,13 +82,14 @@ public class AStar {
 
 				// get the A* meta information about this City
 				AStarCityWrapper nextCity;
+				
 				if (foundCities.containsKey(n))
 					nextCity = foundCities.get(n);
 				else {
 					nextCity = new AStarCityWrapper(n);
 					foundCities.put(n, nextCity);
 				}
-
+				System.out.println(nextCity.city.getName());
 				if (closedSet.contains(nextCity)) // it has already been
 													// considered
 					continue;
@@ -95,16 +98,18 @@ public class AStar {
 				RoadInfo edge = (RoadInfo) e.getInfo();
 				// System.out.println(edge.getWeightedDistance());
 				double edgeweight = edge.getWeightedDistance() * Parameters.DISTANCE_WEIGHT
-						+ edge.getSpeed() * Parameters.SPEED_WEIGHT + edge.getScaledPopulation() * Parameters.POP_WEIGHT
+						+ edge.getSpeed() * Parameters.SPEED_WEIGHT - edge.getScaledPopulation() * Parameters.POP_WEIGHT
 						+ edge.getScaledCost() * Parameters.COST_WEIGHT
 						+ edge.getTransportLevel() * Parameters.TRANSPORT_LEVEL_WEIGHT
 						+ edge.getDeaths() * Parameters.RISK_WEIGHT * refugee.dangerCare();
-				//System.out.println("gx: " + x.gx + " edgeweight: " + edgeweight);
+				System.out.println(edge.getScaledPopulation());
+				System.out.println("gx: " + x.gx + " edgeweight: " + edgeweight);
 				double tentativeCost = x.gx + edgeweight; // changed from
 															// integer, still
 															// need to change
 															// the weighting of
-															// the edge weight
+										// the edge weight
+				
 				boolean better = false;
 
 				if (!openSet.contains(nextCity)) {
@@ -119,11 +124,12 @@ public class AStar {
 				// store A* information about this promising candidate City
 				if (better) {
 					nextCity.cameFrom = x;
+					System.out.println("Edge: " + tentativeCost);
 					nextCity.gx = tentativeCost;
-					//System.out.println("hx: " + nextCity.hx);
+					System.out.println("hx: " + nextCity.hx);
 					nextCity.fx = nextCity.gx + nextCity.hx;
-					 //System.out.println("gx: " +
-					 //nextCity.gx + "fx: " + nextCity.fx);
+					 System.out.println("gx: " +
+					 nextCity.gx + "fx: " + nextCity.fx);
 				}
 			}
 
@@ -288,7 +294,7 @@ public class AStar {
 
 		@Override
 		public int compareTo(AStarCityWrapper aStarCityWrapper) {
-			return Double.compare(this.hx, aStarCityWrapper.hx);
+			return Double.compare(this.fx, aStarCityWrapper.fx);
 		}
 	}
 }
