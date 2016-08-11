@@ -15,7 +15,7 @@ public class Stats {
 		String actual_file = "parameter_sweeps/actual.csv";
 		readInActual(actual_file, actualpop);
 		
-		String compareFile = "parameter_sweeps/risk/output_arrive";
+		String compareFile = "parameter_sweeps/new_pop-risk/output_arrive";
 		compareToFile(compareFile, actualpop);
 		
 	}
